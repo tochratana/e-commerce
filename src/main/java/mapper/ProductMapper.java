@@ -5,6 +5,8 @@ import model.dto.product.ProductResponseDto;
 import model.dto.product.UpdateProductDto;
 import model.entities.Product;
 
+import java.util.UUID;
+
 public class ProductMapper {
 
     public Product toEntity(ProductCreateDto dto) {
@@ -19,11 +21,11 @@ public class ProductMapper {
 
     public ProductResponseDto toResponseDto(Product product) {
         return new ProductResponseDto(
-                product.getUuid().toString(),
+                product.getUuid().toString(), // Convert UUID to String
                 product.getName(),
                 product.getPrice(),
                 product.getQuantity(),
-                "Category " + product.getCategoryId(),
+                "Category " + product.getCategoryId(), // Simple category name mapping
                 product.getIsDeleted()
         );
     }

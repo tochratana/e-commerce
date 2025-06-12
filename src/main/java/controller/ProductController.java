@@ -1,18 +1,21 @@
 package controller;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import model.dto.product.ProductCreateDto;
 import model.dto.product.ProductResponseDto;
 import model.dto.product.UpdateProductDto;
 import model.service.ProductService;
+import model.service.ProductServiceImpl;
 
 import java.util.List;
 import java.util.Optional;
-
 public class ProductController {
     private final ProductService productService;
 
     public ProductController() {
-        this.productService = new ProductService();
+        this.productService = new ProductServiceImpl(); // Use implementation
     }
 
     public ProductResponseDto createProduct(ProductCreateDto createDto) {
@@ -24,19 +27,35 @@ public class ProductController {
     }
 
     public List<ProductResponseDto> getAllProducts() {
-        return productService.getAllProducts();
+        try {
+            return productService.getAllProducts();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to retrieve products: " + e.getMessage());
+        }
     }
 
     public List<ProductResponseDto> getProductsByCategory(Long categoryId) {
-        return productService.getProductsByCategory(categoryId);
+        try {
+            return productService.getProductsByCategory(categoryId);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to retrieve products by category: " + e.getMessage());
+        }
     }
 
     public List<ProductResponseDto> searchProducts(String name) {
-        return productService.searchProductsByName(name);
+        try {
+            return productService.searchProductsByName(name);
+        } catch (Exception e) {
+            throw new RuntimeException("Product search failed: " + e.getMessage());
+        }
     }
 
     public Optional<ProductResponseDto> getProductById(String uuid) {
-        return productService.getProductById(uuid);
+        try {
+            return productService.getProductById(uuid);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to retrieve product: " + e.getMessage());
+        }
     }
 
     public ProductResponseDto updateProduct(UpdateProductDto updateDto) {
@@ -52,6 +71,30 @@ public class ProductController {
             productService.deleteProduct(uuid);
         } catch (Exception e) {
             throw new RuntimeException("Product deletion failed: " + e.getMessage());
+        }
+    }
+
+    public ProductResponseDto restoreProduct(String uuid) {
+        try {
+            return productService.restoreProduct(uuid);
+        } catch (Exception e) {
+            throw new RuntimeException("Product restoration failed: " + e.getMessage());
+        }
+    }
+
+    public List<ProductResponseDto> getAllProductsIncludingDeleted() {
+        try {
+            return productService.getAllProductsIncludingDeleted();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to retrieve all products: " + e.getMessage());
+        }
+    }
+
+    public void permanentlyDeleteProduct(String uuid) {
+        try {
+            productService.permanentlyDeleteProduct(uuid);
+        } catch (Exception e) {
+            throw new RuntimeException("Permanent deletion failed: " + e.getMessage());
         }
     }
 
