@@ -4,14 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Timestamp;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Order {
-    private String orderCode;
+public class CardItem {
+    private Integer id;
     private Integer userId;
-    private Timestamp orderDate;
-    private Double totalPrice;
+    private Integer productId;
+    private Integer quantity;
 }
