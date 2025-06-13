@@ -4,6 +4,7 @@ import controller.ProductController;
 import model.dto.product.ProductCreateDto;
 import model.dto.product.ProductResponseDto;
 import model.dto.product.UpdateProductDto;
+import view.completeUITable;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,7 +25,9 @@ public class ProductServer {
         System.out.println("Server started successfully!");
 
         while (true) {
-            displayMenu();
+            System.out.println(completeUITable.showProductMenuUI());
+//            displayMenu();
+            System.out.print("[+] Enter your choice (1-10): ");
             int choice = getUserChoice();
 
             try {
@@ -115,6 +118,9 @@ public class ProductServer {
 
         System.out.println("Product created successfully!");
         displayProduct(created);
+
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
     }
 
     private void viewAllProducts() {
@@ -132,6 +138,8 @@ public class ProductServer {
 //            System.out.printf("Found %d products:%n", products.size());
 //            products.forEach(this::displayProduct);
 //        }
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
     }
 
     private void viewProductById() {
@@ -146,6 +154,8 @@ public class ProductServer {
         } else {
             System.out.println("Product not found.");
         }
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
     }
 
     private void searchProductsByName() {
@@ -161,6 +171,8 @@ public class ProductServer {
             System.out.printf("Found %d products matching '%s':%n", products.size(), name);
             products.forEach(this::displayProduct);
         }
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
     }
 
     private void viewProductsByCategory() {
@@ -176,6 +188,8 @@ public class ProductServer {
             System.out.printf("Found %d products in category %d:%n", products.size(), categoryId);
             products.forEach(this::displayProduct);
         }
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
     }
 
     private void updateProduct() {
@@ -201,6 +215,9 @@ public class ProductServer {
 
         System.out.println("Product updated successfully!");
         displayProduct(updated);
+
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
     }
 
     private void deleteProduct() {
@@ -217,6 +234,9 @@ public class ProductServer {
         } else {
             System.out.println("Delete operation cancelled.");
         }
+
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
     }
 
     private void insertMillionProducts() {
