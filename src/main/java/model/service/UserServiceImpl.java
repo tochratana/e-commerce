@@ -23,15 +23,16 @@ public class UserServiceImpl implements UserService {
             System.out.println("User not found or deleted.");
             return null;
         }
-        boolean passwordMatches = PasswordHash.checkPassword(password, user.getPassword());
 
-        if (!passwordMatches&&!user.getEmail().equals(email)) {
+        String storedPassword = user.getPassword();
+        if (storedPassword == null || !PasswordHash.checkPassword(password, storedPassword)) {
             System.out.println("Incorrect email or password.");
             return null;
         }
+
         user.set_logged_in(true);
         userRepository.updateIsLoggedInStatus(user.getUuid(), true);
-        writeSessionToFile(user,"Logged in");
+        writeSessionToFile(user);
         return UserMapper.mapToUserResponseDto(user);
     }
 
@@ -94,7 +95,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void writeSessionToFile(Users user,String action) {
+    public void writeSessionToFile(Users user) {
         try (PrintWriter out = new PrintWriter("current_session.txt")) {
             out.println(user.getUuid());
         } catch (IOException e) {
@@ -103,15 +104,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean logout(String uuid) {
-        Users user = userRepository.findByUserUuid(uuid);
-        if (user == null || !user.is_deleted()) {
+    public boolean logout() {
+        Users user = loadCurrentSession();
+        if (user == null || user.is_deleted()) {
             return false;
         }
 
-        userRepository.updateIsLoggedInStatus(uuid, false);
-        writeSessionToFile(user, "LOGOUT");
-
+        userRepository.updateIsLoggedInStatus(user.getUuid(), false);
+        writeSessionToFile(user);
+        clearCurrentSession();
         return true;
     }
     @Override
@@ -123,7 +124,6 @@ public class UserServiceImpl implements UserService {
             }
             Users user = userRepository.findByUserUuid(uuid);
             if (user != null && user.is_logged_in()) {
-                System.out.println("User is logged in.");
                 return user;
             }
             else {
@@ -141,6 +141,7 @@ public class UserServiceImpl implements UserService {
         File file = new File("current_session.txt");
         if (file.exists()) {
             file.delete();
+            System.out.println("Logout successfully");
         }
     }
 }

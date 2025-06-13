@@ -15,8 +15,8 @@ public interface UserService {
     Integer deleteUserByUuid(String uuid, DeleteUserDto deleteUserDto);
     UserResponseDto getUserByUuid(String uuid);
     UserResponseDto updateUserByUuid(String uuid, UpdateUserDto updateUserDto);
-    void writeSessionToFile(Users user,String action);
-    boolean logout(String uuid);
+    void writeSessionToFile(Users user);
+    boolean logout();
     Users loadCurrentSession();
     void clearCurrentSession();
 }

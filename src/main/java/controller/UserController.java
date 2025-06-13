@@ -27,6 +27,9 @@ public class UserController {
     public UserResponseDto updateUserByUuid(String uuid, UpdateUserDto updateUserDto){
         return userService.updateUserByUuid(uuid, updateUserDto);
     }
+    public boolean logout(){
+        return userService.logout();
+    }
     public boolean callUser(){
         UserServiceImpl userService = new UserServiceImpl();
         Users currentUser = userService.loadCurrentSession();

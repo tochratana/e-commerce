@@ -32,6 +32,7 @@ public class UserUI {
                 2. Product Management
                 3. Order Management
                 4. Exit
+                5. Logout
                 """);
     }
 
@@ -151,8 +152,22 @@ public class UserUI {
                     isRunning = false;
                     break;
                 }
+                case 5:{
+                    System.out.print("Are you sure you want to logout? (y/n):");
+                    String answer = new Scanner(System.in).nextLine();
+                    if(answer.equalsIgnoreCase("y")){
+                        userController.logout();
+                    }
+                    else if(answer.equalsIgnoreCase("n")){
+                        isRunning = true;
+                    }
+                    else {
+                        System.out.println("Invalid option!");
+                        return;
+                    }
+                }
                 default: {
-                    System.out.println("Invalid option. Please choose 1-4.");
+                    System.out.println("Invalid option. Please choose 1-5.");
                     break;
                 }
             }
