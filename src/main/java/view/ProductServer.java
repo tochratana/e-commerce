@@ -5,6 +5,7 @@ import model.dto.product.ProductCreateDto;
 import model.dto.product.ProductResponseDto;
 import model.dto.product.UpdateProductDto;
 import view.completeUITable;
+import static view.Color.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,7 +22,7 @@ public class ProductServer {
     }
 
     public void start() {
-        System.out.println("=== Product Management Server ===");
+        System.out.println(GREEN + "=== Product Management Server ===" + RESET);
         System.out.println("Server started successfully!");
 
         while (true) {
@@ -60,7 +61,7 @@ public class ProductServer {
             return -1;
         }
     }
-
+    //todo (part: back to menu not work)
     private void handleMenuChoice(int choice) {
         switch (choice) {
             case 1:

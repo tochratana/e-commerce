@@ -131,13 +131,23 @@ public class completeUI {
                         break;
 
                     case 4 :
-                        SessionManager.logout();
-                        System.out.println("[✓] Logged out successfully!");
-                        return;
-
-                    case 5 :
                         System.out.println("Thank you for using our system!");
                         isRunning = false;
+
+                    case 5 :
+                        System.out.print("Are you sure you want to logout? (y/n):");
+                        String answer = new Scanner(System.in).nextLine();
+                        if(answer.equalsIgnoreCase("y")){
+                            SessionManager.logout();
+                            System.out.println("[✓] Logged out successfully!");
+                        }
+                        else if(answer.equalsIgnoreCase("n")){
+                            isRunning = true;
+                        }
+                        else {
+                            System.out.println("Invalid option!");
+                            return;
+                        }
 
                     default :
                         System.out.println("[!] Invalid option.");
@@ -181,22 +191,8 @@ public class completeUI {
             }
         }
     }
-    // Order management
 
-    //todo Cart Menu (not yet at table)
-    private static void showCartMenu() {
-        System.out.println(completeUITable.showCartMenuUI());
-        int choice = scanner.nextInt();
-        switch (choice) {
-            case 1 :
-            case 2 :
-            case 3 : return;
-            default : System.out.println("[!] Invalid option!");
-
-        }
-    }
-
-    //todo User Menu (not yet at table)
+    //todo User Menu
     public static void showUserMenu() {
         while(true) {
             System.out.println(completeUITable.showUserMenuUI());
