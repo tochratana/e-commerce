@@ -1,14 +1,8 @@
 package view;
 
 import controller.UserController;
-import model.dto.DeleteUserDto;
-import model.dto.UpdateUserDto;
 import model.dto.UserCreateDto;
 import model.dto.UserResponseDto;
-import model.entities.Users;
-
-import java.sql.Date;
-import java.time.LocalDate;
 import java.util.Scanner;
 
 public class UserUI {
@@ -50,6 +44,7 @@ public class UserUI {
                     String password = new Scanner(System.in).next();
                     UserResponseDto user = userController.login(email, password);
                     System.out.println(user);
+                    userController.callUser();
                 }
             }
         }

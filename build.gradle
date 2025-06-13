@@ -18,6 +18,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.36'
     // gradle
     implementation 'org.postgresql:postgresql:42.7.2'
+    implementation 'org.mindrot:jbcrypt:0.4'
 }
 
 test {

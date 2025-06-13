@@ -32,7 +32,7 @@ public class UserController {
         Users currentUser = userService.loadCurrentSession();
         boolean isloggedin = false;
         if (currentUser != null) {
-            System.out.println("Welcome back, " + currentUser.getUsername());
+            System.out.println("Welcome " + currentUser.getUsername());
             isloggedin = true;
         } else {
             System.out.println("No active session found. Please log in.");

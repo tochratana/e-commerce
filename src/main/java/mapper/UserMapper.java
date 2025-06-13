@@ -3,19 +3,21 @@ package mapper;
 import model.dto.UserCreateDto;
 import model.dto.UserResponseDto;
 import model.entities.Users;
+import utils.PasswordHash;
 
 import java.util.Random;
 import java.util.UUID;
 
 public class UserMapper {
-    public static Users mapFromUserCreateDto(UserCreateDto dto) {
-        if (dto == null || dto.username() == null || dto.email() == null || dto.password() == null) {
+    public static Users mapFromUserCreateDto(UserCreateDto user) {
+        String hashedPassword = PasswordHash.hashPassword(user.password());
+        if (user == null || user.username() == null || user.email() == null || user.password() == null) {
             throw new IllegalArgumentException("UserCreateDto fields must not be null");
         }
         return new Users(new Random().nextInt(999999999),
-                dto.username(),
-                dto.email(),
-                dto.password(),
+                user.username(),
+                user.email(),
+                hashedPassword,
                 false,
                 UUID.randomUUID().toString(),
                 false);

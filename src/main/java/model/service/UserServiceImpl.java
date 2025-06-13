@@ -7,6 +7,7 @@ import model.dto.UserCreateDto;
 import model.dto.UserResponseDto;
 import model.entities.Users;
 import model.repositories.UserRepository;
+import utils.PasswordHash;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -22,7 +23,9 @@ public class UserServiceImpl implements UserService {
             System.out.println("User not found or deleted.");
             return null;
         }
-        if (!user.getPassword().equals(password)&&!user.getEmail().equals(email)) {
+        boolean passwordMatches = PasswordHash.checkPassword(password, user.getPassword());
+
+        if (!passwordMatches&&!user.getEmail().equals(email)) {
             System.out.println("Incorrect email or password.");
             return null;
         }
@@ -114,20 +117,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public Users loadCurrentSession() {
         try (BufferedReader br = new BufferedReader(new FileReader("current_session.txt"))) {
-            System.out.println("Session file opened successfully.");
-
             String uuid = br.readLine();
-            System.out.println("Read UUID from file: " + uuid);
-
             if (uuid == null || uuid.isBlank()) {
-                System.out.println("UUID is blank or null.");
                 return null;
             }
-
             Users user = userRepository.findByUserUuid(uuid);
-            System.out.println("User found from DB: " + (user != null ? user.getUsername() : "null"));
-
-            if (user != null) {
+            if (user != null && user.is_logged_in()) {
                 System.out.println("User is logged in.");
                 return user;
             }
