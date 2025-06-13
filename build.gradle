@@ -1,5 +1,13 @@
 plugins {
-    id 'java'
+    id 'application'
+}
+
+application {
+    mainClass = 'Application' // No package!
+}
+
+run {
+    standardInput = System.in
 }
 
 group = 'com.tochratana'
@@ -13,13 +21,11 @@ dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     //    lombok
-    // https://mvnrepository.com/artifact/org.projectlombok/lombok
     compileOnly 'org.projectlombok:lombok:1.18.36'
     annotationProcessor 'org.projectlombok:lombok:1.18.36'
-    // gradle
+    // driver database
     implementation 'org.postgresql:postgresql:42.7.2'
     // Text table
-//    implementation 'de.vandermeer:text-table-formatter:1.1.2'
     implementation("org.nocrala.tools.texttablefmt:text-table-formatter:1.2.4")
 
 }

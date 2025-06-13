@@ -2,8 +2,14 @@ package view;
 
 import controller.AddToCartController;
 import controller.ProductController;
+<<<<<<< HEAD
 import model.dto.product.*;
 import model.repositories.ProductRepository;
+=======
+import model.dto.product.ProductCreateDto;
+import model.dto.product.ProductResponseDto;
+import model.dto.product.UpdateProductDto;
+>>>>>>> ea167f60145c06217b4caf77bda66c11e501a775
 
 import java.sql.SQLException;
 import java.util.List;
