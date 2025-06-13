@@ -8,9 +8,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrderItem {
-    private Integer id;
-    private String orderId;
+    private String itemCode;
+    private String orderCode;
+    private Integer productId;
     private Integer quantity;
     private Double price;
-    private Integer productId;
 }

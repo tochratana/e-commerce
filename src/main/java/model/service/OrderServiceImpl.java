@@ -1,58 +1,107 @@
 package model.service;
 
-import lombok.AllArgsConstructor;
-import model.entities.CardItem;
+import model.dto.OrderDto;
+import model.dto.OrderItemDto;
 import model.entities.Order;
-import model.entities.OrderItem;
-import model.entities.Product;
-import model.repositories.*;
-
+import model.repositories.OrderRepository;
+import service.OrderItemService;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
-import static java.lang.String.valueOf;
-
-
-@AllArgsConstructor
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
-    private final OrderItemRepository  orderItemRepository;
-    private final CardItemRepository  cardItemRepository;
-    private final ProductRepository productRepository;
+    private final OrderItemService orderItemService;
 
+    public OrderServiceImpl(OrderRepository orderRepository, OrderItemService orderItemService) {
+        this.orderRepository = orderRepository;
+        this.orderItemService = orderItemService;
+    }
 
     @Override
-    public void createOrder(Integer userId) {
-        Optional<CardItem> cardItems = cardItemRepository.findById(userId);
-
-        if(cardItems.isEmpty()){
-            System.out.println("❌ No items in cart.");
-            return;
-        }
-
-        //Create Order
+    public void createOrder(OrderDto orderDto) {
+        String orderCode = "ORD-" + UUID.randomUUID().toString();
         Order order = new Order();
-        order.setOrderCode("ORD-" + UUID.randomUUID().toString().substring(0, 8));
-        order.setUserId(userId);
-        order.setOrderDate(Timestamp.valueOf(LocalDateTime.now()));
+        order.setOrderCode(orderCode);
+        order.setUserId(orderDto.userId());
+        order.setOrderDate(new Timestamp(System.currentTimeMillis()));
+        order.setTotalPrice(calculateTotalPrice(orderDto.items()));
 
+        orderRepository.save(order);
 
-        //Get order to order item
+        for (OrderItemDto itemDto : orderDto.items()) {
+            OrderItemDto newItem = new OrderItemDto(
+                    "ITEM-" + UUID.randomUUID().toString(),
+                    orderCode,
+                    itemDto.productId(),
+                    itemDto.quantity(),
+                    itemDto.price()
+            );
+            orderItemService.addItemToOrder(newItem);
+        }
+    }
 
-        CardItem cardItem = cardItems.get();
-        Optional<Product> product = productRepository.findById(valueOf(cardItem.getId()));
+    @Override
+    public void getAllOrders() {
+        orderRepository.findAll().forEach(order -> {
+            List<OrderItemDto> items = orderItemService.getItemsByOrderCode(order.getOrderCode());
+            System.out.println("\nOrder: " + order.getOrderCode());
+            System.out.println("User: " + order.getUserId());
+            System.out.println("Date: " + order.getOrderDate());
+            System.out.println("Total: $" + order.getTotalPrice());
+            items.forEach(item -> System.out.printf(" - Product %d: %d x $%.2f%n",
+                    item.productId(), item.quantity(), item.price()));
+        });
+    }
 
-        // Calculate and SetOrderItem
+    @Override
+    public OrderDto getOrderByCode(String orderCode) {
+        return orderRepository.findByCode(orderCode)
+                .map(order -> {
+                    List<OrderItemDto> items = orderItemService.getItemsByOrderCode(orderCode);
+                    return new OrderDto(
+                            order.getOrderCode(),
+                            order.getUserId(),
+                            order.getOrderDate(),
+                            order.getTotalPrice(),
+                            items
+                    );
+                })
+                .orElse(null);
+    }
 
+    @Override
+    public boolean cancelOrder(String orderCode) {
+        try {
+            orderItemService.getItemsByOrderCode(orderCode)
+                    .forEach(item -> orderItemService.deleteItem(item.itemCode()));
+            orderRepository.deleteByCode(orderCode);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
-        // Print Recept Order
-        // 5. Print summary
-        System.out.println("✅ Order placed successfully!");
-        System.out.println("📦 Order Code: " + order.getOrderCode());
-        System.out.println("📅 Date: " + order.getOrderDate());
-        System.out.println("🧾 Total Price: $" );
-        System.out.println("🛒 Number of Products: " );
+    @Override
+    public List<OrderDto> getOrdersByUserId(String userId) {
+        return orderRepository.findByUserId(userId).stream()
+                .map(order -> {
+                    List<OrderItemDto> items = orderItemService.getItemsByOrderCode(order.getOrderCode());
+                    return new OrderDto(
+                            order.getOrderCode(),
+                            order.getUserId(),
+                            order.getOrderDate(),
+                            order.getTotalPrice(),
+                            items
+                    );
+                })
+                .collect(Collectors.toList());
+    }
+
+    private double calculateTotalPrice(List<OrderItemDto> items) {
+        return items.stream()
+                .mapToDouble(item -> item.price() * item.quantity())
+                .sum();
     }
 }
