@@ -18,7 +18,11 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.36'
     // gradle
     implementation 'org.postgresql:postgresql:42.7.2'
+    // Hash password
     implementation 'org.mindrot:jbcrypt:0.4'
+    // Text table
+    implementation("org.nocrala.tools.texttablefmt:text-table-formatter:1.2.4")
+
 }
 
 test {

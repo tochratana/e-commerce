@@ -17,15 +17,16 @@ import java.util.Optional;
 
 public class UserRepository implements Repository<Users,Integer>{
     private static final DatabaseConfig databaseConfig = new DatabaseConfig();
+    private final DatabaseConfig dbConfig = new DatabaseConfig();
     @Override
     public Users save(Users entity) {
         String sql = """
                 INSERT INTO users (username,email,password,is_deleted,uuid,is_logged_in)
                 VALUES (?,?,?,?,?,?);
                 """;
-        try(Connection con = DatabaseConnection.getConnection()){
-            assert con != null;
-            PreparedStatement pre = con.prepareStatement(sql);
+        try(Connection conn = dbConfig.getDatabaseConnection()){
+            assert conn != null;
+            PreparedStatement pre = conn.prepareStatement(sql);
             pre.setString(1, entity.getUsername());
             pre.setString(2, entity.getEmail());
             pre.setString(3, entity.getPassword());
@@ -47,9 +48,9 @@ public class UserRepository implements Repository<Users,Integer>{
                 SELECT * FROM users
                 WHERE id = ?;
                 """;
-        try(Connection con = DatabaseConnection.getConnection()){
-            assert con != null;
-            PreparedStatement pre = con.prepareStatement(sql);
+        try(Connection conn = dbConfig.getDatabaseConnection()){
+            assert conn != null;
+            PreparedStatement pre = conn.prepareStatement(sql);
             pre.setInt(1,integer);
             ResultSet rs = pre.executeQuery();
             while(rs.next()){
@@ -70,8 +71,8 @@ public class UserRepository implements Repository<Users,Integer>{
                 SELECT * FROM users
                 WHERE uuid = ?
                 """;
-        try(Connection con = DatabaseConnection.getConnection()){
-            PreparedStatement pre = con.prepareStatement(sql);
+        try(Connection conn = dbConfig.getDatabaseConnection()){
+            PreparedStatement pre = conn.prepareStatement(sql);
             pre.setString(1, uuid);
             ResultSet result = pre.executeQuery();
             Users user = new Users();
@@ -95,8 +96,8 @@ public class UserRepository implements Repository<Users,Integer>{
                 SELECT * FROM users
                 WHERE email = ?
                 """;
-        try(Connection con = DatabaseConnection.getConnection()){
-            PreparedStatement pre = con.prepareStatement(sql);
+        try(Connection conn = dbConfig.getDatabaseConnection()){
+            PreparedStatement pre = conn.prepareStatement(sql);
             pre.setString(1, email);
             ResultSet result = pre.executeQuery();
             Users user = new Users();
@@ -122,9 +123,9 @@ public class UserRepository implements Repository<Users,Integer>{
                 SELECT * FROM users
                 WHERE is_logged_in = false;
                 """;
-        try(Connection con = DatabaseConnection.getConnection()){
-            assert con != null;
-            Statement stmt = con.createStatement();
+        try(Connection conn = dbConfig.getDatabaseConnection()){
+            assert conn != null;
+            Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
             List<Users> list = new ArrayList<>();
             while(rs.next()){
@@ -151,9 +152,9 @@ public class UserRepository implements Repository<Users,Integer>{
                 SET is_deleted = ?
                 WHERE id = ?;
                 """;
-        try(Connection con = DatabaseConnection.getConnection()){
-            assert con != null;
-            PreparedStatement pre = con.prepareStatement(sql);
+        try(Connection conn = dbConfig.getDatabaseConnection()){
+            assert conn != null;
+            PreparedStatement pre = conn.prepareStatement(sql);
             pre.setBoolean(1,true);
             pre.setInt(2,user.getId());
             int rowAffected = pre.executeUpdate();
@@ -175,8 +176,8 @@ public class UserRepository implements Repository<Users,Integer>{
                     SET username=?, email=?
                     WHERE uuid = ?
                     """;
-            try(Connection con = DatabaseConnection.getConnection()){
-                PreparedStatement pre = con.prepareStatement(sql);
+            try(Connection conn = dbConfig.getDatabaseConnection()){
+                PreparedStatement pre = conn.prepareStatement(sql);
                 pre.setString(1, updateUserDto.username());
                 pre.setString(2, updateUserDto.email());
                 pre.setString(3, uuid);
@@ -194,8 +195,8 @@ public class UserRepository implements Repository<Users,Integer>{
     public void updateIsLoggedInStatus(String uuid, boolean status) {
         findByUserUuid(uuid);
         String sql = "UPDATE users SET is_logged_in = ? WHERE uuid = ?";
-        try (Connection con = DatabaseConnection.getConnection();
-                PreparedStatement pre = con.prepareStatement(sql)) {
+        try (Connection conn = dbConfig.getDatabaseConnection();
+                PreparedStatement pre = conn.prepareStatement(sql)) {
                 pre.setBoolean(1, status);
                 pre.setString(2, uuid);
                 pre.executeUpdate();
