@@ -1,5 +1,13 @@
 plugins {
-    id 'java'
+    id 'application'
+}
+
+application {
+    mainClass = 'Application' // No package!
+}
+
+run {
+    standardInput = System.in
 }
 
 group = 'com.tochratana'
