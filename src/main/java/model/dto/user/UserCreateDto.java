@@ -1,6 +1,4 @@
-package model.dto;
-
-import lombok.Data;
+package model.dto.user;
 
 public record UserCreateDto(
         String username,

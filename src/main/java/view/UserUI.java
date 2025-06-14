@@ -1,18 +1,41 @@
 package view;
 
+import controller.OrderController;
 import controller.UserController;
-import model.dto.DeleteUserDto;
-import model.dto.UpdateUserDto;
-import model.dto.UserCreateDto;
-import model.dto.UserResponseDto;
+import model.dto.user.DeleteUserDto;
+import model.dto.user.UpdateUserDto;
+import model.dto.user.UserCreateDto;
+import model.dto.user.UserResponseDto;
+import model.entities.Users;
+import model.repositories.CartRepositoryImpl;
+import model.repositories.OrderRepository;
+import model.repositories.OrderRepositoryImpl;
+import model.service.OrderService;
+import model.service.OrderServiceImpl;
+import model.service.UserService;
+import model.service.UserServiceImpl;
+import model.service.ProductService;
+import model.service.ProductServiceImpl;
+
 import java.util.Scanner;
 
 public class UserUI {
     private static final UserController userController = new UserController();
-    private static final Scanner scanner = new Scanner(System.in); // Single scanner instance
+    private static final Scanner scanner = new Scanner(System.in);
     private static boolean isRunning = true;
 
-    private static void loginMenu(){
+    // Initialize dependencies in the correct order
+    private static final CartRepositoryImpl cartRepositoryImpl = new CartRepositoryImpl();
+    private static final OrderRepository orderRepository = new OrderRepositoryImpl();
+    private static final UserService userService = new UserServiceImpl();
+    private static final ProductService productService = new ProductServiceImpl();
+    private static final OrderService orderService = new OrderServiceImpl(cartRepositoryImpl, orderRepository, userService, productService);
+    private static final OrderController orderController = new OrderController(orderService);
+    private static final OrderUI orderUI = new OrderUI(orderController); // ✅ Pass OrderController to OrderUI
+
+    private static UserResponseDto loggedInUser; // ✅ Class-level variable
+
+    private static void loginMenu() {
         System.out.println("============================");
         System.out.println("      User Creation    ");
         System.out.println("============================");
@@ -23,7 +46,7 @@ public class UserUI {
                 """);
     }
 
-    private static void mainMenu(){
+    private static void mainMenu() {
         System.out.println("============================");
         System.out.println("       Main Menu        ");
         System.out.println("============================");
@@ -31,11 +54,12 @@ public class UserUI {
                 1. User Management
                 2. Product Management
                 3. Order Management
-                4. Exit
+                4. Logout
+                5. Exit
                 """);
     }
 
-    private static void userManagementMenu(){
+    private static void userManagementMenu() {
         System.out.println("============================");
         System.out.println("     User Management    ");
         System.out.println("============================");
@@ -49,14 +73,14 @@ public class UserUI {
                 """);
     }
 
-    public static void home(){
-        while(isRunning) {
-            if(!userController.callUser()) {
-                // User not logged in - show login menu
+    public static void home() {
+        // ✅ Try to restore session on startup
+        loadSessionOnStartup();
+        while (isRunning) {
+            if (loggedInUser == null) {
                 loginMenu();
                 handleLoginMenu();
             } else {
-                // User is logged in - show main menu
                 mainMenu();
                 handleMainMenu();
             }
@@ -64,15 +88,39 @@ public class UserUI {
         System.out.println("Thank you for using our application!");
         scanner.close();
     }
+    // ✅ Add this new method
+    private static void loadSessionOnStartup() {
+        try {
+            UserService userService = new UserServiceImpl();
+            Users sessionUser = userService.loadCurrentSession();
+            if (sessionUser != null) {
+                // Convert to UserResponseDto
+                loggedInUser = new UserResponseDto(
+                        sessionUser.getId(),
+                        sessionUser.getUsername(),
+                        sessionUser.getEmail(),
+                        sessionUser.getUuid()
+                );
+                System.out.println("═══════════════════════════");
+                System.out.println("Welcome back, " + loggedInUser.username() + "!");
+                System.out.println("Previous session restored.");
+                System.out.println("═══════════════════════════");
+            }
+        } catch (Exception e) {
+            System.out.println("No previous session found or session expired.");
+            // If there's an error loading session, just start fresh
+            loggedInUser = null;
+        }
+    }
 
     private static void handleLoginMenu() {
         try {
             System.out.print("[+] Insert option: ");
             int option = scanner.nextInt();
-            scanner.nextLine(); // Consume the newline after nextInt()
+            scanner.nextLine();
 
             switch (option) {
-                case 1: {
+                case 1 -> {
                     System.out.println("[+] Register [+]");
                     System.out.print("[+] Insert Username: ");
                     String username = scanner.nextLine();
@@ -85,36 +133,29 @@ public class UserUI {
                     UserResponseDto user = userController.register(userCreateDto);
                     System.out.println("Registration successful!");
                     System.out.println(user);
-                    break;
                 }
-                case 2: {
-                    System.out.println("[+] Login [+] ");
+                case 2 -> {
+                    System.out.println("[+] Login [+]");
                     System.out.print("Enter email: ");
                     String email = scanner.nextLine();
                     System.out.print("Enter password: ");
                     String password = scanner.nextLine();
 
                     UserResponseDto user = userController.login(email, password);
-                    if(user != null) {
+                    if (user != null) {
+                        loggedInUser = user; // ✅ Correct use
                         System.out.println("Login successful!");
                         System.out.println(user);
                     } else {
                         System.out.println("Login failed. Please check your credentials.");
                     }
-                    break;
                 }
-                case 3: {
-                    isRunning = false;
-                    break;
-                }
-                default: {
-                    System.out.println("Invalid option. Please choose 1, 2, or 3.");
-                    break;
-                }
+                case 3 -> isRunning = false;
+                default -> System.out.println("Invalid option. Please choose 1, 2, or 3.");
             }
         } catch (Exception e) {
             System.err.println("An error occurred: " + e.getMessage());
-            scanner.nextLine(); // Clear invalid input
+            scanner.nextLine(); // Clear input
         }
     }
 
@@ -122,15 +163,11 @@ public class UserUI {
         try {
             System.out.print("[+] Insert option: ");
             int option = scanner.nextInt();
-            scanner.nextLine(); // Consume the newline after nextInt()
+            scanner.nextLine();
 
             switch (option) {
-                case 1: {
-                    System.out.println("=== User Management ===");
-                    handleUserManagement();
-                    break;
-                }
-                case 2: {
+                case 1 -> handleUserManagement();
+                case 2 -> {
                     System.out.println("=== Product Management ===");
                     try {
                         ProductServer productServer = new ProductServer();
@@ -138,27 +175,35 @@ public class UserUI {
                     } catch (Exception e) {
                         System.err.println("Error starting Product Management: " + e.getMessage());
                     }
-                    break;
                 }
-                case 3: {
+                case 3 -> {
                     System.out.println("=== Order Management ===");
-                    // TODO: Implement order management
-                    System.out.println("Order Management functionality - Coming soon!");
-                    break;
+                    if (loggedInUser != null) {
+                        orderUI.start(loggedInUser.id()); // ✅ Pass correct user ID
+                    } else {
+                        System.out.println("You need to log in to access order management.");
+                    }
                 }
-                case 4: {
+                case 4 -> {
+                    System.out.println("Logging out...");
+                    UserService userService = new UserServiceImpl();
+                    boolean logoutSuccess = userService.logout(); // ✅ Use the service logout method
+                    if (logoutSuccess) {
+                        loggedInUser = null; // Clear the UI session
+                        System.out.println("Logged out successfully!");
+                    } else {
+                        System.out.println("Logout failed.");
+                    }
+                }
+                case 5 -> {
                     System.out.println("Thank you for using our system!");
                     isRunning = false;
-                    break;
                 }
-                default: {
-                    System.out.println("Invalid option. Please choose 1-4.");
-                    break;
-                }
+                default -> System.out.println("Invalid option. Please choose 1-5.");
             }
         } catch (Exception e) {
             System.err.println("An error occurred: " + e.getMessage());
-            scanner.nextLine(); // Clear invalid input
+            scanner.nextLine();
         }
     }
 
@@ -170,15 +215,11 @@ public class UserUI {
                 userManagementMenu();
                 System.out.print("[+] Insert option: ");
                 int option = scanner.nextInt();
-                scanner.nextLine(); // Consume newline
+                scanner.nextLine();
 
                 switch (option) {
-                    case 1: {
-                        System.out.println("=== All Users ===");
-                        userController.getAllUsers().forEach(System.out::println);
-                        break;
-                    }
-                    case 2: {
+                    case 1 -> userController.getAllUsers().forEach(System.out::println);
+                    case 2 -> {
                         System.out.println("=== Create New User ===");
                         System.out.print("[+] Insert Username: ");
                         String username = scanner.nextLine();
@@ -191,9 +232,8 @@ public class UserUI {
                         UserResponseDto user = userController.register(userCreateDto);
                         System.out.println("User created successfully!");
                         System.out.println(user);
-                        break;
                     }
-                    case 3: {
+                    case 3 -> {
                         System.out.println("=== Update User ===");
                         System.out.print("[+] Insert User UUID: ");
                         String uuid = scanner.nextLine();
@@ -211,9 +251,8 @@ public class UserUI {
                         } else {
                             System.out.println("Failed to update user. Please check the UUID.");
                         }
-                        break;
                     }
-                    case 4: {
+                    case 4 -> {
                         System.out.println("=== Find User by UUID ===");
                         System.out.print("[+] Insert User UUID: ");
                         String uuid = scanner.nextLine();
@@ -225,9 +264,8 @@ public class UserUI {
                         } else {
                             System.out.println("User not found with UUID: " + uuid);
                         }
-                        break;
                     }
-                    case 5: {
+                    case 5 -> {
                         System.out.println("=== Delete User ===");
                         System.out.print("[+] Insert User UUID: ");
                         String uuid = scanner.nextLine();
@@ -246,28 +284,18 @@ public class UserUI {
                         } else {
                             System.out.println("Delete operation cancelled.");
                         }
-                        break;
                     }
-                    case 6: {
-                        System.out.println("Returning to Main Menu...");
-                        userManagementRunning = false;
-                        break;
-                    }
-                    default: {
-                        System.out.println("Invalid option. Please choose 1-6.");
-                        break;
-                    }
+                    case 6 -> userManagementRunning = false;
+                    default -> System.out.println("Invalid option. Please choose 1-6.");
                 }
 
-                // Pause before showing menu again (except when going back to main menu)
                 if (userManagementRunning) {
                     System.out.println("\nPress Enter to continue...");
                     scanner.nextLine();
                 }
-
             } catch (Exception e) {
                 System.err.println("An error occurred: " + e.getMessage());
-                scanner.nextLine(); // Clear invalid input
+                scanner.nextLine();
             }
         }
     }

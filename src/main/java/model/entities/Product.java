@@ -26,4 +26,6 @@ public class Product {
         this.categoryId = categoryId;
         this.isDeleted = false;
     }
+
+
 }

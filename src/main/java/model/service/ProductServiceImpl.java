@@ -6,7 +6,11 @@ import model.dto.product.ProductResponseDto;
 import model.dto.product.UpdateProductDto;
 import model.entities.Product;
 import model.repositories.ProductRepository;
+import utils.DatabaseConnection;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +24,33 @@ public class ProductServiceImpl implements ProductService {
     public ProductServiceImpl(){
         this.productRepository = new ProductRepository();
         this.productMapper = new ProductMapper();
+    }
+    @Override
+    public Product getProductById(int productId) {
+        String sql = "SELECT * FROM products WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, productId);
+            ResultSet rs = stmt.executeQuery();
+
+
+            if (rs.next()) {
+                return new Product(
+                        UUID.fromString(rs.getString("uuid")),     // if uuid is stored as VARCHAR in DB
+                        rs.getString("name"),
+                        rs.getDouble("price"),
+                        rs.getInt("quantity"),
+                        rs.getLong("category_id"),
+                        rs.getBoolean("is_deleted")
+                );
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     @Override

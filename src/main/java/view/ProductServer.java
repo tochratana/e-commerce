@@ -118,7 +118,7 @@ public class ProductServer {
     }
 
     private void viewAllProducts() {
-        TableUI<ProductResponseDto> tableUI = new TableUI<>();
+        view.TableUI<ProductResponseDto> tableUI = new view.TableUI<>();
         System.out.println("\n=== All Products ===");
 
         List<ProductResponseDto> products = productController.getAllProducts();

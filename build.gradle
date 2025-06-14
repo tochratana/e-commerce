@@ -27,6 +27,8 @@ dependencies {
     implementation 'org.postgresql:postgresql:42.7.2'
     // Text table
     implementation("org.nocrala.tools.texttablefmt:text-table-formatter:1.2.4")
+    // Hash password
+    implementation 'org.mindrot:jbcrypt:0.4'
 
 }
 
