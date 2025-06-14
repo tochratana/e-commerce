@@ -36,6 +36,7 @@ public class UserUI {
     private static UserResponseDto loggedInUser; // ✅ Class-level variable
 
     private static void loginMenu() {
+        ModernUIComponents.showWelcomeSplash("E-Commerce","1.0.0");
         System.out.println("============================");
         System.out.println("      User Creation    ");
         System.out.println("============================");
@@ -45,6 +46,8 @@ public class UserUI {
                 3. Exit
                 """);
     }
+
+
 
     private static void mainMenu() {
         System.out.println("============================");
@@ -94,21 +97,18 @@ public class UserUI {
             UserService userService = new UserServiceImpl();
             Users sessionUser = userService.loadCurrentSession();
             if (sessionUser != null) {
-                // Convert to UserResponseDto
                 loggedInUser = new UserResponseDto(
                         sessionUser.getId(),
                         sessionUser.getUsername(),
                         sessionUser.getEmail(),
                         sessionUser.getUuid()
                 );
-                System.out.println("═══════════════════════════");
-                System.out.println("Welcome back, " + loggedInUser.username() + "!");
-                System.out.println("Previous session restored.");
-                System.out.println("═══════════════════════════");
+
+                // Just show the modern welcome box - remove duplicate messages
+                ModernUIComponents.showModernWelcomeBox(loggedInUser.username());
             }
         } catch (Exception e) {
             System.out.println("No previous session found or session expired.");
-            // If there's an error loading session, just start fresh
             loggedInUser = null;
         }
     }
@@ -144,6 +144,7 @@ public class UserUI {
                     UserResponseDto user = userController.login(email, password);
                     if (user != null) {
                         loggedInUser = user; // ✅ Correct use
+                        ModernUIComponents.showModernWelcomeBox(user.username());
                         System.out.println("Login successful!");
                         System.out.println(user);
                     } else {
