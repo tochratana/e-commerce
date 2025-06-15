@@ -23,6 +23,8 @@ public class UserUI {
     private static final UserController userController = new UserController();
     private static final Scanner scanner = new Scanner(System.in);
     private static boolean isRunning = true;
+    public static String usernameUserLoign;
+
 
     // Initialize dependencies in the correct order
     private static final CartRepositoryImpl cartRepositoryImpl = new CartRepositoryImpl();
@@ -46,8 +48,6 @@ public class UserUI {
                 3. Exit
                 """);
     }
-
-
 
     private static void mainMenu() {
         System.out.println("============================");
@@ -123,13 +123,13 @@ public class UserUI {
                 case 1 -> {
                     System.out.println("[+] Register [+]");
                     System.out.print("[+] Insert Username: ");
-                    String username = scanner.nextLine();
+                    usernameUserLoign = scanner.nextLine();
                     System.out.print("[+] Insert Email: ");
                     String email = scanner.nextLine();
                     System.out.print("[+] Insert password: ");
                     String password = scanner.nextLine();
 
-                    UserCreateDto userCreateDto = new UserCreateDto(username, email, password);
+                    UserCreateDto userCreateDto = new UserCreateDto(usernameUserLoign, email, password);
                     UserResponseDto user = userController.register(userCreateDto);
                     System.out.println("Registration successful!");
                     System.out.println(user);
@@ -219,7 +219,11 @@ public class UserUI {
                 scanner.nextLine();
 
                 switch (option) {
-                    case 1 -> userController.getAllUsers().forEach(System.out::println);
+                    case 1 -> {
+                        TableUI<UserResponseDto> tableUI = new TableUI<>();
+                        tableUI.getTableDisplay(userController.getAllUsers());
+                        //userController.getAllUsers();
+                    }
                     case 2 -> {
                         System.out.println("=== Create New User ===");
                         System.out.print("[+] Insert Username: ");
