@@ -10,13 +10,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class ProductRepository implements Repository<Product, String> {
-    private final DatabaseConfig dbConfig = new DatabaseConfig();
+    //private final DatabaseConfig dbConfig = new DatabaseConfig();
 
     @Override
     public Product save(Product product) {
         String sql = "INSERT INTO products (uuid, name, price, quantity, category_id, is_deleted) VALUES (?::uuid, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = dbConfig.getDatabaseConnection()) {
+        try (Connection conn = DatabaseConfig.getDatabaseConnection()) {
             if (conn == null) {
                 throw new RuntimeException("Failed to establish a database connection.");
             }
@@ -45,7 +45,7 @@ public class ProductRepository implements Repository<Product, String> {
     @Override
     public Optional<Product> findById(String uuid) {
         String sql = "SELECT * FROM products WHERE uuid = ?::uuid AND is_deleted = false";
-        try (Connection conn = dbConfig.getDatabaseConnection()) {
+        try (Connection conn = DatabaseConfig.getDatabaseConnection()) {
             if (conn == null) {
                 throw new RuntimeException("Failed to establish a database connection.");
             }
@@ -71,7 +71,7 @@ public class ProductRepository implements Repository<Product, String> {
     public List<Product> findAll() {
         List<Product> products = new ArrayList<>();
         String sql = "SELECT * FROM products WHERE is_deleted = false ORDER BY name";
-        try (Connection conn = dbConfig.getDatabaseConnection()) {
+        try (Connection conn = DatabaseConfig.getDatabaseConnection()) {
             if (conn == null) {
                 throw new RuntimeException("Failed to establish a database connection.");
             }
@@ -99,7 +99,7 @@ public class ProductRepository implements Repository<Product, String> {
 
         // Soft delete: set is_deleted = true
         String sql = "UPDATE products SET is_deleted = true, updated_at = CURRENT_TIMESTAMP WHERE uuid = ?::uuid";
-        try (Connection conn = dbConfig.getDatabaseConnection()) {
+        try (Connection conn = DatabaseConfig.getDatabaseConnection()) {
             if (conn == null) {
                 throw new RuntimeException("Failed to establish a database connection.");
             }
@@ -123,7 +123,7 @@ public class ProductRepository implements Repository<Product, String> {
     @Override
     public Product update(Product product) {
         String sql = "UPDATE products SET name = ?, price = ?, quantity = ?, category_id = ?, updated_at = CURRENT_TIMESTAMP WHERE uuid = ?::uuid AND is_deleted = false";
-        try (Connection conn = dbConfig.getDatabaseConnection()) {
+        try (Connection conn = DatabaseConfig.getDatabaseConnection()) {
             if (conn == null) {
                 throw new RuntimeException("Failed to establish a database connection.");
             }
@@ -150,7 +150,7 @@ public class ProductRepository implements Repository<Product, String> {
     public List<Product> findByCategory(Long categoryId) {
         List<Product> products = new ArrayList<>();
         String sql = "SELECT * FROM products WHERE category_id = ? AND is_deleted = false ORDER BY name";
-        try (Connection conn = dbConfig.getDatabaseConnection()) {
+        try (Connection conn = DatabaseConfig.getDatabaseConnection()) {
             if (conn == null) {
                 throw new RuntimeException("Failed to establish a database connection.");
             }
@@ -174,7 +174,7 @@ public class ProductRepository implements Repository<Product, String> {
     public List<Product> findByNameStartingWith(String prefix) {
         List<Product> products = new ArrayList<>();
         String sql = "SELECT * FROM products WHERE LOWER(name) LIKE LOWER(?) AND is_deleted = false ORDER BY name";
-        try (Connection conn = dbConfig.getDatabaseConnection()) {
+        try (Connection conn = DatabaseConfig.getDatabaseConnection()) {
             if (conn == null) {
                 throw new RuntimeException("Failed to establish a database connection.");
             }
@@ -197,7 +197,7 @@ public class ProductRepository implements Repository<Product, String> {
 
     public void batchInsert(List<Product> products) {
         String sql = "INSERT INTO products (uuid, name, price, quantity, category_id, is_deleted) VALUES (?::uuid, ?, ?, ?, ?, ?)";
-        try (Connection conn = dbConfig.getDatabaseConnection()) {
+        try (Connection conn = DatabaseConfig.getDatabaseConnection()) {
             if (conn == null) {
                 throw new RuntimeException("Failed to establish a database connection.");
             }
@@ -227,7 +227,7 @@ public class ProductRepository implements Repository<Product, String> {
 
     public void restoreById(String uuid) {
         String sql = "UPDATE products SET is_deleted = false, updated_at = CURRENT_TIMESTAMP WHERE uuid = ?::uuid";
-        try (Connection conn = dbConfig.getDatabaseConnection()) {
+        try (Connection conn = DatabaseConfig.getDatabaseConnection()) {
             if (conn == null) {
                 throw new RuntimeException("Failed to establish a database connection.");
             }
@@ -249,7 +249,7 @@ public class ProductRepository implements Repository<Product, String> {
     public List<Product> findAllIncludingDeleted() {
         List<Product> products = new ArrayList<>();
         String sql = "SELECT * FROM products ORDER BY name";
-        try (Connection conn = dbConfig.getDatabaseConnection()) {
+        try (Connection conn = DatabaseConfig.getDatabaseConnection()) {
             if (conn == null) {
                 throw new RuntimeException("Failed to establish a database connection.");
             }
@@ -270,7 +270,7 @@ public class ProductRepository implements Repository<Product, String> {
 
     public void hardDeleteById(String uuid) {
         String sql = "DELETE FROM products WHERE uuid = ?::uuid";
-        try (Connection conn = dbConfig.getDatabaseConnection()) {
+        try (Connection conn = DatabaseConfig.getDatabaseConnection()) {
             if (conn == null) {
                 throw new RuntimeException("Failed to establish a database connection.");
             }

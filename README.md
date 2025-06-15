@@ -356,16 +356,10 @@ The application includes comprehensive error handling for:
     - Verify session timeout configuration
     - Clear session files if corrupted
 
-3. **Maven Build Issues**:
-    - Ensure Java 11+ is installed
-    - Update Maven to latest version
-    - Clear Maven cache: `mvn clean`
-
-### Debug Mode
-Run with debug logging:
-```bash
-mvn exec:java -Dexec.mainClass="com.ecommerce.Main" -Dlogging.level=DEBUG
-```
+3. **Gradle Build Issues**:
+    - Ensure Java 21 is installed
+    - Update Gradle to latest version
+    - Clear Gradle cache: `./gradlew clean`
 
 ## License
 
@@ -373,4 +367,5 @@ mvn exec:java -Dexec.mainClass="com.ecommerce.Main" -Dlogging.level=DEBUG
 
 ---
 
-> **Note**: This application is designed Java mini project that I have learned in course Full-Stack web development.
+> **Note**: This application is designed Java mini project that I have learned in course Full-Stack web development 
+> at [ISTAD](https://cstad.edu.kh/).

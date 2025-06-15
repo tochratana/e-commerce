@@ -15,7 +15,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 public class UserRepositoryImpl implements Repository<Users, Integer> {
-    private final DatabaseConfig databaseConfig = new DatabaseConfig();
+    //private final DatabaseConfig databaseConfig = new DatabaseConfig();
 
     @Override
     public Users save(Users entity) {

@@ -6,7 +6,8 @@ import model.dto.product.ProductResponseDto;
 import model.dto.product.UpdateProductDto;
 import model.entities.Product;
 import model.repositories.ProductRepository;
-import utils.DatabaseConnection;
+import utils.DatabaseConfig;
+//import utils.DatabaseConnection;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -28,7 +29,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Product getProductById(int productId) {
         String sql = "SELECT * FROM products WHERE id = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConfig.getDatabaseConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, productId);
