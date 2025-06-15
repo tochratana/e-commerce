@@ -4,7 +4,6 @@ import controller.ProductController;
 import model.dto.product.ProductCreateDto;
 import model.dto.product.ProductResponseDto;
 import model.dto.product.UpdateProductDto;
-import view.completeUITable;
 import static view.Color.*;
 
 import java.util.List;
