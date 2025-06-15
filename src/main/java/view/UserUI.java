@@ -171,7 +171,7 @@ public class UserUI {
                 case 2 -> {
                     System.out.println("=== Product Management ===");
                     try {
-                        ProductServer productServer = new ProductServer();
+                        ProductUI productServer = new ProductUI();
                         productServer.start();
                     } catch (Exception e) {
                         System.err.println("Error starting Product Management: " + e.getMessage());

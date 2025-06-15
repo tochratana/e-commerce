@@ -168,8 +168,8 @@ e-commerce/
             │
             ├── utils/
             │   ├── DatabaseConfig.java
-            │   ├── DatabaseConnection.java
             │   └── PasswordHash.java
+            │   
             │
             ├── view/
             │   ├── ModernUIComponents.java
