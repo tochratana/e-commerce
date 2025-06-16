@@ -1,6 +1,5 @@
 package view;
 
-import model.dto.order.OrderDTO;
 import model.dto.order.OrderItemDto;
 import model.dto.product.ProductResponseDto;
 import model.dto.user.UserResponseDto;
@@ -16,34 +15,38 @@ public class TableUI<T> {
     private String[] columnNames;
     private final CellStyle center = new CellStyle(CellStyle.HorizontalAlign.CENTER);
 
+    // ANSI color codes for styling headers (bold yellow)
+    private static final String HEADER_COLOR = "\u001B[1;33m"; // Bold yellow
+    private static final String RESET_COLOR = "\u001B[0m";
+
     public void getTableDisplay(List<T> tList) {
-        // ✅ Handle null or empty list
         if (tList == null || tList.isEmpty()) {
-            System.out.println("⚠️ No data to display.");
+            System.out.println("No data to display.");
             return;
         }
 
-        // ✅ Safe access using get(0), not getFirst()
         T firstItem = tList.get(0);
 
-        // ✅ Identify type and set up columns
+        // ✅ Use simple ASCII border for full compatibility
+        BorderStyle borderStyle = BorderStyle.CLASSIC_WIDE;
+
         if (firstItem instanceof ProductResponseDto) {
-            table = new Table(6, BorderStyle.UNICODE_BOX_DOUBLE_BORDER, ShownBorders.ALL);
+            table = new Table(6, borderStyle, ShownBorders.ALL);
             columnNames = new String[]{"UUID", "Name", "Price", "Quantity", "Category", "Status"};
         } else if (firstItem instanceof UserResponseDto) {
-            table = new Table(3, BorderStyle.UNICODE_BOX_DOUBLE_BORDER, ShownBorders.ALL);
+            table = new Table(3, borderStyle, ShownBorders.ALL);
             columnNames = new String[]{"UUID", "User Name", "Email"};
         } else if (firstItem instanceof OrderItemDto) {
-            table = new Table(4, BorderStyle.UNICODE_BOX_DOUBLE_BORDER, ShownBorders.ALL);
+            table = new Table(4, borderStyle, ShownBorders.ALL);
             columnNames = new String[]{"ORDER ID", "Product Name", "Price", "Quantity"};
         } else {
-            System.out.println("⚠️ Unsupported data type.");
+            System.out.println("Unsupported data type.");
             return;
         }
 
-        // ✅ Add headers
+        // ✅ Add headers with color
         for (String column : columnNames) {
-            table.addCell(column, center);
+            table.addCell(HEADER_COLOR + column + RESET_COLOR, center);
         }
 
         // ✅ Add data rows
