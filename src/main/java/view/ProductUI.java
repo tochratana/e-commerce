@@ -63,21 +63,7 @@ public class ProductUI {
     }
 
     private void displayProductMenu() {
-        System.out.println("============================");
-        System.out.println("    Product Management   ");
-        System.out.println("============================");
-        System.out.println("""
-                1. Create Product
-                2. View All Products
-                3. View Product by ID
-                4. Search Products by Name
-                5. View Products by Category
-                6. Update Product
-                7. Delete Product
-                8. Insert Million Products (Performance Test)
-                9. Read Million Products (Performance Test)
-                10. Back to Main Menu
-                """);
+        System.out.println(completeUITable.showProductMenuUI());
     }
 
     private int getUserChoice() {
@@ -311,13 +297,14 @@ public class ProductUI {
     }
 
     private void displayProduct(ProductResponseDto product) {
-        System.out.println("┌─────────────────────────────────────────────────────────────┐");
-        System.out.printf("│ UUID: %-53s │%n", product.getUuid());
-        System.out.printf("│ Name: %-53s │%n", product.getName());
-        System.out.printf("│ Price: $%-50.2f │%n", product.getPrice());
-        System.out.printf("│ Quantity: %-47d │%n", product.getQuantity());
-        System.out.printf("│ Category: %-47s │%n", product.getCategoryName());
-        System.out.printf("│ Status: %-49s │%n", product.getIsDeleted() ? "Deleted" : "Active");
-        System.out.println("└─────────────────────────────────────────────────────────────┘");
+        System.out.println(completeUITable.displayProduct(product));
+//        System.out.println("┌─────────────────────────────────────────────────────────────┐");
+//        System.out.printf("│ UUID: %-53s │%n", product.getUuid());
+//        System.out.printf("│ Name: %-53s │%n", product.getName());
+//        System.out.printf("│ Price: $%-50.2f │%n", product.getPrice());
+//        System.out.printf("│ Quantity: %-47d │%n", product.getQuantity());
+//        System.out.printf("│ Category: %-47s │%n", product.getCategoryName());
+//        System.out.printf("│ Status: %-49s │%n", product.getIsDeleted() ? "Deleted" : "Active");
+//        System.out.println("└─────────────────────────────────────────────────────────────┘");
     }
 }

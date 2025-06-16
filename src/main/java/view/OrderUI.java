@@ -9,14 +9,14 @@ import model.dto.order.OrderDTO;
 import model.dto.order.OrderItemDto;
 import model.dto.product.ProductResponseDto;
 import model.entities.Cart;
-import model.entities.Product;
 import model.entities.Users;
 
 import java.util.*;
-
+import java.util.Scanner;
 import model.service.ProductService;
-import model.service.UserService;
 import model.service.UserServiceImpl;
+
+import static view.UIComponents.*;
 
 public class OrderUI {
     private final ProductController productController;
@@ -33,17 +33,8 @@ public class OrderUI {
 
     public void start(int userId) {
         while (true) {
-            System.out.println("\n==================== Order Menu ====================");
-            System.out.println("| 1. Add Item to Cart                              |");
-            System.out.println("| 2. View Cart                                     |");
-            System.out.println("| 3. Place Order                                   |");
-            System.out.println("| 4. View All Orders                               |");
-            System.out.println("| 5. View Order Detail                             |");
-            System.out.println("| 6. Cancel Order                                  |");
-            System.out.println("| 7. Back to Main Menu                             |");
-            System.out.println("====================================================");
+            System.out.println(completeUITable.showOrderMenuUI());
             System.out.print(">>> Choose an option (1-7): ");
-
 
             int choice = readInt("Please enter a valid number between 0 and 4: ");
             switch (choice) {
@@ -74,19 +65,7 @@ public class OrderUI {
     }
 
     private void printReceipt(OrderDTO order) {
-        System.out.println("\n========= 🧾 ORDER RECEIPT =========");
-        System.out.println("Order Code  : " + order.orderCode());
-        System.out.println("Order Date  : " + order.orderDate());
-        System.out.println("-------------------------------------");
-        System.out.printf("%-20s %5s %10s%n", "Product", "Qty", "Price");
-        for (OrderItemDto item : order.items()) {
-            System.out.printf("%-20s %5d %10.2f%n",
-                    item.productName(), item.quantity(), item.productPrice());
-        }
-        System.out.println("-------------------------------------");
-        System.out.printf("Total Quantity: %d%n", order.totalQuantity());
-        System.out.printf("Total Price   : $%.2f%n", order.totalPrice());
-        System.out.println("=====================================\n");
+        System.out.println(completeUITable.printReceiptUI(order));
     }
 
 
@@ -110,14 +89,11 @@ public class OrderUI {
             System.out.println("Order not found.");
             return;
         }
-
         // Print order summary info
-        System.out.printf("Order Code: %s, Date: %s, Total Price: %.2f%n",
-                order.orderCode(), order.orderDate(), order.totalPrice());
-
+//        System.out.printf("Order Code: %s, Date: %s, Total Price: %.2f%n",
+//                order.orderCode(), order.orderDate(), order.totalPrice());
         // Display order items as table
         List<OrderItemDto> items = order.items();
-
         if (items == null || items.isEmpty()) {
             System.out.println("No items in this order.");
             return;
@@ -125,24 +101,24 @@ public class OrderUI {
 
         TableUI<OrderItemDto> tableUI = new TableUI<>();
         tableUI.getTableDisplay(items);
+        System.out.println(completeUITable.orderDetailUI(order));
     }
-
 
     private void cancelOrder(int userId) {
         List<OrderDTO> orders = controller.getOrdersByUser(userId);
         List<OrderItemDto> orderItems = controller.getAllOrderItemByUserId(userId);
         if (orders.isEmpty()) {
-            System.out.println("No orders found.");
+            System.out.println(RED+"No orders found."+RESET);
             return;
         }
         TableUI<OrderItemDto> tableUI = new TableUI<>();
         tableUI.getTableDisplay(orderItems);
 
-        int orderId = readPositiveInt("Enter order ID to cancel: ");
-        System.out.print("Are you sure you want to cancel this order? (y/n): ");
+        int orderId = readPositiveInt("[+] Enter order ID to cancel: ");
+        System.out.print(RED+"Are you sure you want to cancel this order? (y/n): "+RESET);
         String confirm = scanner.nextLine().trim();
         if (!confirm.equalsIgnoreCase("y")) {
-            System.out.println("Order cancellation aborted.");
+            System.out.println(RED+"Order cancellation aborted."+RESET);
             return;
         }
 
@@ -151,16 +127,16 @@ public class OrderUI {
     }
 
     public void addItemToCart(int userId) {
-        // ✅ Load currently logged-in user
+        // Load currently logged-in user
         Users currentUser = userService.loadCurrentSession();
         if (currentUser == null) {
-            System.out.println("\n⚠️ No user is currently logged in. Please log in first.");
+            System.out.println(RED+"\n⚠️ No user is currently logged in. Please log in first."+RESET);
             return;
         }
 
         userId = currentUser.getId();
 
-        // ✅ Display products
+        // Display products
         List<ProductResponseDto> products = productController.getAllProducts();
         view.TableUI<ProductResponseDto> tableUI = new view.TableUI<>();
         tableUI.getTableDisplay(products);
@@ -176,7 +152,7 @@ public class OrderUI {
                 UUID.fromString(productUUID); // Validate UUID format
                 break; // valid UUID, exit loop
             } catch (IllegalArgumentException e) {
-                System.out.println("❌ Invalid UUID format. Please enter a valid UUID.");
+                System.out.println(RED+"❌ Invalid UUID format. Please enter a valid UUID."+RESET);
             }
         }
 
@@ -187,16 +163,16 @@ public class OrderUI {
             try {
                 quantity = Integer.parseInt(quantityInput);
                 if (quantity <= 0) {
-                    System.out.println("❌ Quantity must be a positive number.");
+                    System.out.println(RED+"❌ Quantity must be a positive number."+RESET);
                 } else {
                     break; // valid quantity, exit loop
                 }
             } catch (NumberFormatException e) {
-                System.out.println("❌ Invalid quantity. Please enter a valid number.");
+                System.out.println(RED+"❌ Invalid quantity. Please enter a valid number."+RESET);
             }
         }
 
-        // ✅ Create DTO and call controller
+        // Create DTO and call controller
         CartItemCreateDto cartItemCreateDto = new CartItemCreateDto(productUUID, quantity);
 
         // Assuming your cartController.addItemToCart returns a String message
@@ -208,14 +184,14 @@ public class OrderUI {
         Users currentUser = userService.loadCurrentSession();
 
         if (currentUser == null) {
-            System.out.println("\n⚠️ No user is currently logged in. Please login first.\n");
+            System.out.println(RED+"\n⚠️ No user is currently logged in. Please login first.\n"+RESET);
             return;
         }
 
         userId = currentUser.getId();
         List<Cart> cartItems = cartController.getCartItemsByUserId(userId);
 
-        System.out.println("\n================== Your Cart ==================");
+        System.out.println("\n============================"+YELLOW + " Your Cart"+RESET+" ============================");
 
         if (cartItems.isEmpty()) {
             System.out.println("🛒 Your cart is empty.\n");
@@ -263,9 +239,9 @@ public class OrderUI {
         int number;
         do {
             System.out.print(prompt);
-            number = readInt("Invalid input. Please enter a valid number: ");
+            number = readInt(RED+"Invalid input. Please enter a valid number: "+RESET);
             if (number <= 0) {
-                System.out.println("Please enter a number greater than 0.");
+                System.out.println(RED+"Please enter a number greater than 0."+RESET);
             }
         } while (number <= 0);
         return number;

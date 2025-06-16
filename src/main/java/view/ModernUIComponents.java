@@ -1,6 +1,14 @@
 package view;
 
+import org.nocrala.tools.texttablefmt.BorderStyle;
+import org.nocrala.tools.texttablefmt.CellStyle;
+import org.nocrala.tools.texttablefmt.ShownBorders;
+import org.nocrala.tools.texttablefmt.Table;
+import org.nocrala.tools.texttablefmt.*;
+
 import java.util.concurrent.TimeUnit;
+
+import static java.awt.Color.blue;
 
 public class ModernUIComponents {
 
@@ -37,6 +45,7 @@ public class ModernUIComponents {
                 (encoding.toLowerCase().contains("utf") || encoding.toLowerCase().contains("unicode"));
     }
 
+    private static final BorderStyle border = BorderStyle.UNICODE_BOX_DOUBLE_BORDER;
     // Enhanced color palette with fallbacks
     public static final String RESET = supportsAnsi ? "\u001B[0m" : "";
     public static final String BOLD = supportsAnsi ? "\u001B[1m" : "";
@@ -120,21 +129,23 @@ public class ModernUIComponents {
                 "    #######  #    #  #######  #        "
         };
 
-        int width = 60;
+        Table table = new Table(1, border, ShownBorders.SURROUND);
+        CellStyle center = new CellStyle(CellStyle.HorizontalAlign.CENTER);
 
-        System.out.println(PRIMARY + BOLD);
-        System.out.println(DOUBLE_TOP_LEFT + DOUBLE_HORIZONTAL.repeat(width) + DOUBLE_TOP_RIGHT);
+        table.setColumnWidth(0,60,100);
 
+        // Add logo lines
         for (String line : logo) {
-            System.out.println(DOUBLE_VERTICAL + centerText(line, width) + DOUBLE_VERTICAL);
+            table.addCell(line, center);
         }
 
-        System.out.println(DOUBLE_VERTICAL + centerText("", width) + DOUBLE_VERTICAL);
-        System.out.println(DOUBLE_VERTICAL + centerText(BOLD + appName + " V" + version, width) + DOUBLE_VERTICAL);
-        System.out.println(DOUBLE_VERTICAL + centerText(DIM + "Modern E-Commerce Management System", width) + DOUBLE_VERTICAL);
-        System.out.println(DOUBLE_VERTICAL + centerText("", width) + DOUBLE_VERTICAL);
+        table.addCell("", center); // Blank spacer
+        table.addCell(BOLD + appName + " V" + version, center);
+        table.addCell(DIM + PRIMARY+ "Modern E-Commerce Management System", center);
+        table.addCell("", center); // Blank spacer
 
-        System.out.println(DOUBLE_BOTTOM_LEFT + DOUBLE_HORIZONTAL.repeat(width) + DOUBLE_BOTTOM_RIGHT);
+        System.out.println(PRIMARY + BOLD);
+        System.out.println(table.render());
         System.out.println(RESET);
 
         showAnimatedLoader("Initializing system", 3);
@@ -150,7 +161,7 @@ public class ModernUIComponents {
         System.out.print(RESET);
         System.out.println(SUCCESS + BOLD);
         System.out.println(ROUNDED_TOP_LEFT + ROUNDED_HORIZONTAL.repeat(width) + ROUNDED_TOP_RIGHT);
-        System.out.println(ROUNDED_VERTICAL + " " + centerText(ICON_SUCCESS + " " + message + " " + ICON_SUCCESS, width) + " " + ROUNDED_VERTICAL);
+        System.out.println(ROUNDED_VERTICAL + centerText(ICON_SUCCESS  + message + ICON_SUCCESS, width) + ROUNDED_VERTICAL);
         System.out.println(ROUNDED_VERTICAL + " " + centerText(DIM + subtitle + RESET + SUCCESS, width) + " " + ROUNDED_VERTICAL);
         System.out.println(ROUNDED_BOTTOM_LEFT + ROUNDED_HORIZONTAL.repeat(width) + ROUNDED_BOTTOM_RIGHT);
         System.out.println(RESET);

@@ -20,6 +20,8 @@ import model.service.ProductServiceImpl;
 
 import java.util.Scanner;
 
+import static view.UIComponents.*;
+
 public class UserUI {
     private static final UserController userController = new UserController();
     private static final Scanner scanner = new Scanner(System.in);
@@ -36,49 +38,23 @@ public class UserUI {
     private static final OrderController orderController = new OrderController(orderService);
     private static final OrderUI orderUI = new OrderUI(orderController,new ProductController(),productService); // ✅ Pass OrderController to OrderUI
 
-    private static UserResponseDto loggedInUser; // ✅ Class-level variable
+    private static UserResponseDto loggedInUser; // Class-level variable
 
     private static void loginMenu() {
         ModernUIComponents.showWelcomeSplash("E-Commerce","1.0.0");
-        System.out.println("============================");
-        System.out.println("      User Creation    ");
-        System.out.println("============================");
-        System.out.println("""
-                1. Register
-                2. Login
-                3. Exit
-                """);
+        System.out.println(completeUITable.LoginMenuUI());
     }
 
     private static void mainMenu() {
-        System.out.println("============================");
-        System.out.println("       Main Menu        ");
-        System.out.println("============================");
-        System.out.println("""
-                1. User Management
-                2. Product Management
-                3. Order Management
-                4. Logout
-                5. Exit
-                """);
+        System.out.println(completeUITable.showMainMenuUI());
     }
 
     private static void userManagementMenu() {
-        System.out.println("============================");
-        System.out.println("     User Management    ");
-        System.out.println("============================");
-        System.out.println("""
-                1. View All Users
-                2. Create User
-                3. Update User
-                4. Find User by UUID
-                5. Delete User
-                6. Back to Main Menu
-                """);
+        System.out.println(completeUITable.showUserMenuUI());
     }
 
     public static void home() {
-        // ✅ Try to restore session on startup
+        // restore session on startup
         loadSessionOnStartup();
         while (isRunning) {
             if (loggedInUser == null) {
@@ -92,7 +68,7 @@ public class UserUI {
         System.out.println("Thank you for using our application!");
         scanner.close();
     }
-    // ✅ Add this new method
+
     private static void loadSessionOnStartup() {
         try {
             UserService userService = new UserServiceImpl();
@@ -109,7 +85,7 @@ public class UserUI {
                 ModernUIComponents.showModernWelcomeBox(loggedInUser.username());
             }
         } catch (Exception e) {
-            System.out.println("No previous session found or session expired.");
+            System.out.println(RED+ "[!] No previous session found or session expired."+RESET);
             loggedInUser = null;
         }
     }
@@ -125,8 +101,17 @@ public class UserUI {
                     System.out.println("[+] Register [+]");
                     System.out.print("[+] Insert Username: ");
                     usernameUserLoign = scanner.nextLine();
-                    System.out.print("[+] Insert Email: ");
-                    String email = scanner.nextLine();
+                    //email validation
+                    String email;
+                    while (true) {
+                        System.out.print("[+] Insert Email: ");
+                        email = scanner.nextLine();
+                        if (email.contains(".com")) {
+                            break; // valid email
+                        } else {
+                            System.out.println(RED+ "[!] Invalid email. Email must contain '.com'. Please try again." + RESET);
+                        }
+                    }
                     System.out.print("[+] Insert password: ");
                     String password = scanner.nextLine();
 
@@ -137,8 +122,17 @@ public class UserUI {
                 }
                 case 2 -> {
                     System.out.println("[+] Login [+]");
-                    System.out.print("Enter email: ");
-                    String email = scanner.nextLine();
+                    //email validation
+                    String email;
+                    while (true) {
+                        System.out.print("[+] Enter Email: ");
+                        email = scanner.nextLine();
+                        if (email.contains(".com")) {
+                            break; // valid email
+                        } else {
+                            System.out.println(RED+ "[!] Invalid email. Email must contain '.com'. Please try again." + RESET);
+                        }
+                    }
                     System.out.print("Enter password: ");
                     String password = scanner.nextLine();
 
@@ -146,14 +140,14 @@ public class UserUI {
                     if (user != null) {
                         loggedInUser = user; // ✅ Correct use
                         ModernUIComponents.showModernWelcomeBox(user.username());
-                        System.out.println("Login successful!");
+                        System.out.println(GREEN+"Login successful!"+RESET);
                         System.out.println(user);
                     } else {
                         System.out.println("Login failed. Please check your credentials.");
                     }
                 }
                 case 3 -> isRunning = false;
-                default -> System.out.println("Invalid option. Please choose 1, 2, or 3.");
+                default -> System.out.println(RED+"[!] Invalid option. Please choose 1, 2, or 3."+RESET);
             }
         } catch (Exception e) {
             System.err.println("An error occurred: " + e.getMessage());
@@ -170,7 +164,6 @@ public class UserUI {
             switch (option) {
                 case 1 -> handleUserManagement();
                 case 2 -> {
-                    System.out.println("=== Product Management ===");
                     try {
                         ProductUI productServer = new ProductUI();
                         productServer.start();
@@ -179,29 +172,28 @@ public class UserUI {
                     }
                 }
                 case 3 -> {
-                    System.out.println("=== Order Management ===");
                     if (loggedInUser != null) {
-                        orderUI.start(loggedInUser.id()); // ✅ Pass correct user ID
+                        orderUI.start(loggedInUser.id()); // Pass correct user ID
                     } else {
-                        System.out.println("You need to log in to access order management.");
+                        System.out.println(RED+"[!] You need to log in to access order management."+RESET);
                     }
                 }
                 case 4 -> {
-                    System.out.println("Logging out...");
+                    System.out.println(RED+"Logging out..."+RESET);
                     UserService userService = new UserServiceImpl();
-                    boolean logoutSuccess = userService.logout(); // ✅ Use the service logout method
+                    boolean logoutSuccess = userService.logout(); //  Use the service logout method
                     if (logoutSuccess) {
                         loggedInUser = null; // Clear the UI session
-                        System.out.println("Logged out successfully!");
+                        System.out.println(GREEN+"Logged out successfully!"+RESET);
                     } else {
-                        System.out.println("Logout failed.");
+                        System.out.println(RED+"[!] Logout failed." +RESET);
                     }
                 }
                 case 5 -> {
-                    System.out.println("Thank you for using our system!");
+                    System.out.println(GREEN+"Thank you for using our system!"+RESET);
                     isRunning = false;
                 }
-                default -> System.out.println("Invalid option. Please choose 1-5.");
+                default -> System.out.println(RED+"[!] Invalid option. Please choose 1-5."+RESET);
             }
         } catch (Exception e) {
             System.err.println("An error occurred: " + e.getMessage());
@@ -226,7 +218,7 @@ public class UserUI {
                         //userController.getAllUsers();
                     }
                     case 2 -> {
-                        System.out.println("=== Create New User ===");
+                        System.out.println(PURPLE+"=== Create New User ==="+RESET);
                         System.out.print("[+] Insert Username: ");
                         String username = scanner.nextLine();
                         System.out.print("[+] Insert Email: ");
@@ -236,11 +228,11 @@ public class UserUI {
 
                         UserCreateDto userCreateDto = new UserCreateDto(username, email, password);
                         UserResponseDto user = userController.register(userCreateDto);
-                        System.out.println("User created successfully!");
+                        System.out.println(GREEN+"User created successfully!"+RESET);
                         System.out.println(user);
                     }
                     case 3 -> {
-                        System.out.println("=== Update User ===");
+                        System.out.println(PURPLE+"=== Update User ==="+RESET);
                         System.out.print("[+] Insert User UUID: ");
                         String uuid = scanner.nextLine();
                         System.out.print("[+] Insert new username: ");
@@ -252,30 +244,30 @@ public class UserUI {
                         UserResponseDto updatedUser = userController.updateUserByUuid(uuid, updateUserDto);
 
                         if (updatedUser != null) {
-                            System.out.println("User updated successfully!");
+                            System.out.println(GREEN+"User updated successfully!"+RESET);
                             System.out.println(updatedUser);
                         } else {
                             System.out.println("Failed to update user. Please check the UUID.");
                         }
                     }
                     case 4 -> {
-                        System.out.println("=== Find User by UUID ===");
+                        System.out.println(PURPLE+"=== Find User by UUID ==="+RESET);
                         System.out.print("[+] Insert User UUID: ");
                         String uuid = scanner.nextLine();
 
                         UserResponseDto user = userController.getUserByUuid(uuid);
                         if (user != null) {
-                            System.out.println("User found:");
+                            System.out.println(GREEN+"User found:"+RESET);
                             System.out.println(user);
                         } else {
-                            System.out.println("User not found with UUID: " + uuid);
+                            System.out.println(RED+"[!] User not found with UUID: " + uuid+RESET);
                         }
                     }
                     case 5 -> {
-                        System.out.println("=== Delete User ===");
+                        System.out.println(PURPLE+"=== Delete User ==="+RESET);
                         System.out.print("[+] Insert User UUID: ");
                         String uuid = scanner.nextLine();
-                        System.out.print("Are you sure you want to delete this user? (yes/no): ");
+                        System.out.print(RED+"Are you sure you want to delete this user? (yes/no): "+RESET);
                         String confirmation = scanner.nextLine();
 
                         if ("yes".equalsIgnoreCase(confirmation)) {
@@ -283,16 +275,16 @@ public class UserUI {
                             Integer result = userController.deleteUserByUuid(uuid, deleteUserDto);
 
                             if (result != null && result > 0) {
-                                System.out.println("User deleted successfully!");
+                                System.out.println(GREEN+"User deleted successfully!"+RESET);
                             } else {
-                                System.out.println("Failed to delete user. Please check the UUID.");
+                                System.out.println(RED+"[!] Failed to delete user. Please check the UUID."+RESET);
                             }
                         } else {
-                            System.out.println("Delete operation cancelled.");
+                            System.out.println(RED+"[!] Delete operation cancelled."+RESET);
                         }
                     }
                     case 6 -> userManagementRunning = false;
-                    default -> System.out.println("Invalid option. Please choose 1-6.");
+                    default -> System.out.println(RED+"[!] Invalid option. Please choose 1-6."+RESET);
                 }
 
                 if (userManagementRunning) {
