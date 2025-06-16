@@ -1,7 +1,9 @@
 package model.service;
 
+import mapper.OrderItemMapper;
 import mapper.OrderMapper;
 import model.dto.order.OrderDTO;
+import model.dto.order.OrderItemDto;
 import model.entities.CartItem;
 import model.entities.Order;
 import model.entities.OrderItem;
@@ -10,6 +12,7 @@ import model.repositories.CartRepositoryImpl;
 import model.repositories.OrderRepository;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -88,6 +91,28 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public List<OrderItemDto> getOrderItemById(int userId) {
+        if (userId <= 0) {
+            throw new IllegalArgumentException("User ID must be positive.");
+        }
+
+        List<Order> orders = orderRepo.findAllByUserId(userId);
+        List<OrderItemDto> itemDtos = new ArrayList<>();
+
+        if (orders == null || orders.isEmpty()) {
+            return List.of();
+        }
+
+        for (Order order : orders) {
+            for (OrderItem item : order.getItems()) { // Assuming `getItems()` returns a list of OrderItem
+                itemDtos.add(OrderItemMapper.toDTO(item));
+            }
+        }
+
+        return itemDtos;
+    }
+
+    @Override
     public List<OrderDTO> getAllOrdersByUser(int userId) {
         if (userId <= 0) {
             throw new IllegalArgumentException("User ID must be positive.");
@@ -102,6 +127,9 @@ public class OrderServiceImpl implements OrderService {
                 .map(OrderMapper::toOrderDTO)
                 .collect(Collectors.toList());
     }
+
+    // TODO OrderItemDto
+
 
     @Override
     public OrderDTO getOrderById(int orderId) {

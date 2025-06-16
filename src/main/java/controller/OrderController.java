@@ -1,6 +1,7 @@
 package controller;
 
 import model.dto.order.OrderDTO;
+import model.dto.order.OrderItemDto;
 import model.service.OrderService;
 
 import java.util.List;
@@ -26,6 +27,11 @@ public class OrderController {
     public OrderDTO getOrderDetail(int orderId) {
         return orderService.getOrderById(orderId);
     }
+
+    public List<OrderItemDto> getAllOrderItemByUserId(int userId) {
+        return orderService.getOrderItemById(userId);
+    }
+
 
     // Cancel order by id
     public boolean cancelOrder(int orderId) {

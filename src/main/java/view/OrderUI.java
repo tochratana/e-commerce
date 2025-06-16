@@ -2,9 +2,11 @@ package view;
 
 import controller.CartController;
 import controller.OrderController;
+import controller.ProductController;
 import model.dto.CartItemCreateDto;
 import model.dto.order.OrderDTO;
 import model.dto.order.OrderItemDto;
+import model.dto.product.ProductResponseDto;
 import model.entities.Cart;
 import model.entities.Users;
 
@@ -15,14 +17,14 @@ import model.service.UserService;
 import model.service.UserServiceImpl;
 
 public class OrderUI {
-
-    private final OrderController controller;
+    private final ProductController productController;
+    private final OrderController  controller;
     private final Scanner scanner = new Scanner(System.in);
     private static  final CartController cartController = new CartController();
     UserServiceImpl userService = new UserServiceImpl();  // Only once
-
-    public OrderUI(OrderController controller) {
+    public OrderUI(OrderController controller,ProductController productController) {
         this.controller = controller;
+        this.productController = productController;
     }
 
     public void start(int userId) {
@@ -42,11 +44,13 @@ public class OrderUI {
                 case 1 -> placeOrder();
                 case 2 -> viewAllOrders(userId);
                 case 3 -> viewOrderDetail();
-                case 4 -> cancelOrder();
+                case 4 -> cancelOrder(userId);
                 case 5 -> {
                     // ✅ Add Item to Cart - using logged-in user session
                     Users currentUser = userService.loadCurrentSession(); // Automatically get the logged-in user
-
+                    List<ProductResponseDto> products = productController.getAllProducts();
+                    view.TableUI<ProductResponseDto> tableUI = new view.TableUI<>();
+                    tableUI.getTableDisplay(products);
                     if (currentUser != null) {
                         userId = currentUser.getId(); // ✅ Get user ID from session
 
@@ -154,9 +158,17 @@ public class OrderUI {
         }
     }
 
-    private void cancelOrder() {
-        int orderId = readPositiveInt("Enter order ID to cancel: ");
+    private void cancelOrder(int userId) {
+        List<OrderDTO> orders = controller.getOrdersByUser(userId);
+        List<OrderItemDto> orderItems = controller.getAllOrderItemByUserId(userId);
+        if (orders.isEmpty()) {
+            System.out.println("No orders found.");
+            return;
+        }
+        TableUI<OrderItemDto> tableUI = new TableUI<>();
+        tableUI.getTableDisplay(orderItems);
 
+        int orderId = readPositiveInt("Enter order ID to cancel: ");
         System.out.print("Are you sure you want to cancel this order? (y/n): ");
         String confirm = scanner.nextLine().trim();
         if (!confirm.equalsIgnoreCase("y")) {
@@ -165,7 +177,7 @@ public class OrderUI {
         }
 
         boolean canceled = controller.cancelOrder(orderId);
-        System.out.println(canceled ? "Order canceled successfully." : "Order not found or could not be canceled.");
+        System.out.println(canceled ? "✅ Order canceled successfully." : "❌ Order not found or could not be canceled.");
     }
 
     // Utility methods for input validation

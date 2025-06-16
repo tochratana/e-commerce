@@ -1,6 +1,7 @@
 package view;
 
 import controller.OrderController;
+import controller.ProductController;
 import controller.UserController;
 import model.dto.user.DeleteUserDto;
 import model.dto.user.UpdateUserDto;
@@ -33,7 +34,7 @@ public class UserUI {
     private static final ProductService productService = new ProductServiceImpl();
     private static final OrderService orderService = new OrderServiceImpl(cartRepositoryImpl, orderRepository, userService, productService);
     private static final OrderController orderController = new OrderController(orderService);
-    private static final OrderUI orderUI = new OrderUI(orderController); // ✅ Pass OrderController to OrderUI
+    private static final OrderUI orderUI = new OrderUI(orderController,new ProductController()); // ✅ Pass OrderController to OrderUI
 
     private static UserResponseDto loggedInUser; // ✅ Class-level variable
 
