@@ -34,7 +34,7 @@ public class UserUI {
     private static final ProductService productService = new ProductServiceImpl();
     private static final OrderService orderService = new OrderServiceImpl(cartRepositoryImpl, orderRepository, userService, productService);
     private static final OrderController orderController = new OrderController(orderService);
-    private static final OrderUI orderUI = new OrderUI(orderController,new ProductController()); // ✅ Pass OrderController to OrderUI
+    private static final OrderUI orderUI = new OrderUI(orderController,new ProductController(),productService); // ✅ Pass OrderController to OrderUI
 
     private static UserResponseDto loggedInUser; // ✅ Class-level variable
 

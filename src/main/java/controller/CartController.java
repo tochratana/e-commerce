@@ -10,9 +10,17 @@ import java.util.List;
 public class CartController {
     private final CartItemServiceImpl cartService = new CartItemServiceImpl();
 
-    public CartItem addItemToCart(CartItemCreateDto cartItemCreateDto, Integer userId) {
-        return cartService.addItemToCart(cartItemCreateDto, userId);
+    public String addItemToCart(CartItemCreateDto cartItemCreateDto, Integer userId) {
+        try {
+            cartService.addItemToCart(cartItemCreateDto, userId);
+            return "Item successfully added to cart.";
+        } catch (IllegalArgumentException e) {
+            return "❌ Error: " + e.getMessage();
+        } catch (Exception e) {
+            return "❌ Unexpected error: " + e.getMessage();
+        }
     }
+
 
     public List<Cart> getCartItemsByUserId(Integer userId) {
         return cartService.getCartItemsByUserId(userId);
