@@ -69,7 +69,7 @@ public class TableUI<T> {
                 table.addCell(String.valueOf(dto.quantity()), center);
             }
         }
-        // Testing
+        // Testings
         // ✅ Print the table
         System.out.println(table.render());
     }
