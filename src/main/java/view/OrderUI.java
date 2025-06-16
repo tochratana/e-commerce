@@ -6,15 +6,21 @@ import model.dto.CartItemCreateDto;
 import model.dto.order.OrderDTO;
 import model.dto.order.OrderItemDto;
 import model.entities.Cart;
+import model.entities.Users;
 
 import java.util.List;
 import java.util.Scanner;
+
+import model.service.UserService;
+import model.service.UserServiceImpl;
 
 public class OrderUI {
 
     private final OrderController controller;
     private final Scanner scanner = new Scanner(System.in);
     private static  final CartController cartController = new CartController();
+    UserServiceImpl userService = new UserServiceImpl();  // Only once
+
     public OrderUI(OrderController controller) {
         this.controller = controller;
     }
@@ -37,34 +43,52 @@ public class OrderUI {
                 case 2 -> viewAllOrders(userId);
                 case 3 -> viewOrderDetail();
                 case 4 -> cancelOrder();
-                case 5 ->  {
-                    // Add Item to Cart
-                    System.out.print("Enter product UUID: ");
-                    String productUUID = scanner.nextLine();
+                case 5 -> {
+                    // ✅ Add Item to Cart - using logged-in user session
+                    Users currentUser = userService.loadCurrentSession(); // Automatically get the logged-in user
 
-                    System.out.print("Enter Quantity: ");
-                    int quantity = scanner.nextInt();
-                    scanner.nextLine();
-                    CartItemCreateDto cartItemCreateDto = new CartItemCreateDto(productUUID, quantity);
+                    if (currentUser != null) {
+                        userId = currentUser.getId(); // ✅ Get user ID from session
 
-                    System.out.print("Enter user ID: ");
+                        System.out.print("Enter product UUID: ");
+                        String productUUID = scanner.nextLine();
 
-                    scanner.nextLine();
-                    System.out.println(cartController.addItemToCart(cartItemCreateDto, userId));
+                        System.out.print("Enter Quantity: ");
+                        int quantity = scanner.nextInt();
+                        scanner.nextLine(); // Clear buffer
 
-                }
-                case 6 -> {
-                    // View Cart
-                    System.out.print("Enter user ID: ");
-                    scanner.nextLine();
-                    List<Cart> cartItems = cartController.getCartItemsByUserId(userId);
-                    if (!cartItems.isEmpty()) {
-                        System.out.println("Cart Items:");
-                        cartItems.forEach(cart -> System.out.println("Product UUID: " + cart.getProductId() + ", Quantity: " + cart.getQuantity()));
+                        CartItemCreateDto cartItemCreateDto = new CartItemCreateDto(productUUID, quantity);
+
+                        // ✅ Now pass both the cart data and user ID
+                        System.out.println(cartController.addItemToCart(cartItemCreateDto, userId));
                     } else {
-                        System.out.println("Cart is empty.");
+                        System.out.println("⚠️ No user is currently logged in. Please login first.");
                     }
                 }
+
+                case 6 -> {
+                    // ✅ View Cart - Automatically using the logged-in user session
+                    Users currentUser = userService.loadCurrentSession(); // Use your existing userService instance
+
+                    if (currentUser != null) {
+                         userId = currentUser.getId(); // Automatically get the user's ID
+
+                        List<Cart> cartItems = cartController.getCartItemsByUserId(userId);
+
+                        if (!cartItems.isEmpty()) {
+                            System.out.println("===== Cart Items =====");
+                            cartItems.forEach(cart -> System.out.println(
+                                    "Product UUID: " + cart.getProductId() +
+                                            ", Quantity: " + cart.getQuantity()));
+                        } else {
+                            System.out.println("🛒 Your cart is empty.");
+                        }
+
+                    } else {
+                        System.out.println("⚠️ No user is currently logged in. Please login first.");
+                    }
+                }
+
                 case 7 -> {
                     System.out.println("Exiting Order Menu.");
                     return;
