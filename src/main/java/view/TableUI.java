@@ -69,6 +69,7 @@ public class TableUI<T> {
                 table.addCell(String.valueOf(dto.quantity()), center);
             }
         }
+        System.out.println("Hello");
         // Testings
         // ✅ Print the table
         System.out.println(table.render());
