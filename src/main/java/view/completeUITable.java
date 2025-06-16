@@ -1,22 +1,21 @@
 package view;
 
-import model.dto.UserResponseDto;
+import model.dto.order.OrderDTO;
+import model.dto.order.OrderItemDto;
 import model.dto.product.ProductResponseDto;
+import model.entities.Cart;
 import org.nocrala.tools.texttablefmt.BorderStyle;
 import org.nocrala.tools.texttablefmt.CellStyle;
 import org.nocrala.tools.texttablefmt.ShownBorders;
 import org.nocrala.tools.texttablefmt.Table;
-
-
 import java.util.List;
-
-import static view.Color.*;
+import static view.UIComponents.*;
 
 public class completeUITable<T> {
-    private Table table;
-    private String [] columnNames;
+
     private static final BorderStyle border = BorderStyle.UNICODE_BOX_DOUBLE_BORDER;
     private static final CellStyle center = new CellStyle(CellStyle.HorizontalAlign.CENTER);
+
     public static String LoginMenuUI() {
         Table table = new Table(1, border, ShownBorders.ALL);
         Table table1 = new Table(1, border, ShownBorders.SURROUND);
@@ -28,8 +27,8 @@ public class completeUITable<T> {
         table2.addCell(BLUE + "USER CREATION" + RESET, center);
 
         String[] menuItems = {
-            "                    1. Login" ,
-            "                    2. Register",
+            "                    1. Register" ,
+            "                    2. Login",
             "                    3. Quit",
         };
 
@@ -54,8 +53,8 @@ public class completeUITable<T> {
                 "               1. User Management" ,
                 "               2. Product Management",
                 "               3. Order Management" ,
-                "               4. Exit",
-                "               5. Logout"
+                "               4. Logout",
+                "               5. Exit"
         };
 
         for (String item : menuItems) {
@@ -64,29 +63,22 @@ public class completeUITable<T> {
 
         return table.render()  + "\n" + menuTable.render();
     }
-
-    //todo (this one back to menu not work)
-    public static String showProductMenuUI(){
-        Table table = new Table(1, border);
+    public static String showUserMenuUI(){
+        Table table = new Table(1);
         Table menuTable = new Table(1, border, ShownBorders.SURROUND);
 
-        table.setColumnWidth(0,70,100);
-        menuTable.setColumnWidth(0,70,100);
+        table.setColumnWidth(0,50,100);
+        menuTable.setColumnWidth(0,50,100);
 
-        table.addCell(BLUE +"PRODUCT MANAGEMENT MENU"+RESET, center);
+        table.addCell(PURPLE+ "USER MANAGEMENT"+ RESET, center);
 
         String[] menuItems = {
-                "             1. Create Product",
-                "             2. View All Products",
-                "             3. View Product by ID",
-                "             4. Search Products by Name",
-                "             5. View Products by Category",
-                "             6. Update Product",
-                "             7. Delete Product",
-                "             8. Insert Million Products (Performance Test)",
-                "             9. Read Million Products (Performance Test)",
-                "             10. Exit ",
-                "             11. Back to Main Menu"
+                "               1. View All Users",
+                "               2. Create User",
+                "               3. Update User",
+                "               4. Find User by UUID",
+                "               5. Delete User",
+                "               6. Back to Main Menu"
         };
 
         for (String item : menuItems) {
@@ -95,157 +87,51 @@ public class completeUITable<T> {
 
         return table.render() +"\n" + menuTable.render();
     }
-    //
-    public String getUserDisplay(List<T> tList){
-        if (tList == null || tList.isEmpty()) {
-            return "No users found";
+    public static String showProductMenuUI(){
+        Table table = new Table(1);
+        Table menuTable = new Table(1, border, ShownBorders.SURROUND);
+
+        table.setColumnWidth(0,50,100);
+        menuTable.setColumnWidth(0,50,100);
+
+        table.addCell( CYAN+"PRODUCT MANAGEMENT MENU"+RESET, center);
+
+        String[] menuItems = {
+                " 1. Create Product",
+                " 2. View All Products",
+                " 3. View Product by ID",
+                " 4. Search Products by Name",
+                " 5. View Products by Category",
+                " 6. Update Product",
+                " 7. Delete Product",
+                " 8. Insert Million Products (Performance Test)",
+                " 9. Read Million Products (Performance Test)",
+                " 10. Back to Main Menu"
+        };
+
+        for (String item : menuItems) {
+            menuTable.addCell(item);
         }
 
-        // Setup table for UserResponseDto
-        if (tList.get(0) instanceof UserResponseDto) {
-            table = new Table(3, BorderStyle.UNICODE_BOX_DOUBLE_BORDER, ShownBorders.ALL);
-            columnNames = new String[]{"UUID", "Username", "Email"};
-
-            // Add headers
-            for (String column : columnNames) {
-                table.addCell(column, center);
-            }
-
-            // Add user data
-            for (T item : tList) {
-                UserResponseDto user = (UserResponseDto) item;
-                table.addCell(user.uuid(), center);
-                table.addCell(user.username(), center);
-                table.addCell(user.email(), center);
-//                table.addCell(user.createdDate().toString(), center);
-            }
-
-            // Set column widths
-            for (int i = 0; i < columnNames.length; i++) {
-                table.setColumnWidth(i, 20, 30);
-            }
-        }
-
-        return table.render();
+        return table.render() +"\n" + menuTable.render();
     }
-    //todo getOrderDisplay
-    /*
-    public String getOrderDisplay(List<OrderDto> orders) {
-        if (orders.isEmpty()) return "No orders found";
-
-        table = new Table(4, BorderStyle.UNICODE_BOX_DOUBLE_BORDER, ShownBorders.ALL);
-        String[] headers = {"Order Code", "Date", "Total", "Status"};
-
-        // Add headers
-        for (String h : headers) {
-            table.addCell(h, center);
-        }
-
-        // Add orders
-        for (OrderDto order : orders) {
-            table.addCell(order.orderCode(), center);
-            table.addCell(order.orderDate().toString(), center);
-            table.addCell(String.format("$%.2f", order.totalPrice()), center);
-            table.addCell("Completed", center); // Assuming all orders are completed
-        }
-
-        return table.render();
-    }
-
-
-
-    public String getOrderItemDisplay(List<OrderItemDto> items) {
-        if (items.isEmpty()) return "No items in this order";
-
-        table = new Table(4, BorderStyle.UNICODE_BOX_DOUBLE_BORDER, ShownBorders.ALL);
-        String[] headers = {"Product", "Price", "Quantity", "Subtotal"};
-
-        // Add headers
-        for (String h : headers) {
-            table.addCell(h, center);
-        }
-
-        // Add items
-        for (OrderItemDto item : items) {
-            ProductResponseDto product = productController.getProductById(item.productId().toString());
-            String productName = product != null ? product.name() : "Unknown Product";
-            double subtotal = item.price() * item.quantity();
-
-            table.addCell(productName, center);
-            table.addCell(String.format("$%.2f", item.price()), center);
-            table.addCell(String.valueOf(item.quantity()), center);
-            table.addCell(String.format("$%.2f", subtotal), center);
-        }
-
-        return table.render();
-    }
-
-     */
-    //todo getCartDisplay
-    /*
-    public String getCartDisplay(List<CartItem> cartItems, List<ProductResponseDto> products) {
-        if (cartItems.isEmpty()) {
-            return "Your cart is empty";
-        }
-
-        // Create table with 5 columns
-        table = new Table(5, BorderStyle.UNICODE_BOX_DOUBLE_BORDER, ShownBorders.ALL);
-
-        // Set column headers
-        String[] headers = {"No.", "Product Name", "Price", "Quantity", "Subtotal"};
-        for (String header : headers) {
-            table.addCell(header, center);
-        }
-
-        double total = 0;
-
-        // Add cart items
-        for (int i = 0; i < cartItems.size(); i++) {
-            CartItem item = cartItems.get(i);
-            ProductResponseDto product = products.stream()
-                    .filter(p -> p.uuid().equals(item.getProductId().toString()))
-                    .findFirst()
-                    .orElse(null);
-
-            if (product != null) {
-                double subtotal = product.price() * item.getQuantity();
-                total += subtotal;
-
-                table.addCell(String.valueOf(i + 1), center);
-                table.addCell(product.name(), center);
-                table.addCell(String.format("$%.2f", product.price()), center);
-                table.addCell(String.valueOf(item.getQuantity()), center);
-                table.addCell(String.format("$%.2f", subtotal), center);
-            }
-        }
-
-        // Add total row
-        table.addCell("TOTAL", new CellStyle(CellStyle.HorizontalAlign.RIGHT), 4);
-        table.addCell(String.format("$%.2f", total), center);
-
-        return table.render();
-    }
-
-     */
-
-
     public static String showOrderMenuUI() {
-        Table header = new Table(1, border);
+        Table header = new Table(1);
         Table menu = new Table(1, border, ShownBorders.SURROUND);
 
-        header.setColumnWidth(0, 60, 80);
-        menu.setColumnWidth(0, 60, 80);
+        header.setColumnWidth(0, 50, 100);
+        menu.setColumnWidth(0, 50, 100);
 
-        header.addCell("ORDER MENU", center);
+        header.addCell(YELLOW+"ORDER MENAGEMENT"+RESET, center);
 
         String[] options = {
-                "    1. Place Order",
-                "    2. View All Orders",
-                "    3. View Order Detail",
-                "    4. Cancel Order",
-                "    5. Add Item to Cart",
-                "    6. View Cart",
-                "    7. Back to Main Menu"
+                "                1. Place Order",
+                "                2. View All Orders",
+                "                3. View Order Detail",
+                "                4. Cancel Order",
+                "                5. Add Item to Cart",
+                "                6. View Cart",
+                "                7. Back to Main Menu"
         };
 
         for (String option : options) {
@@ -254,29 +140,119 @@ public class completeUITable<T> {
 
         return header.render() + "\n" + menu.render();
     }
-    public static String showUserMenuUI(){
-        Table table = new Table(1, border);
-        Table menuTable = new Table(1, border, ShownBorders.SURROUND);
+    public static String displayProduct(ProductResponseDto product) {
+        // Create a single-column table with borders
+        Table table = new Table(1, BorderStyle.UNICODE_BOX_DOUBLE_BORDER, ShownBorders.ALL);
 
-        table.setColumnWidth(0,70,100);
-        menuTable.setColumnWidth(0,70,100);
+        // Set fixed width to match your original box size
+        table.setColumnWidth(0, 55, 55); // Fixed width of 55 characters
 
-        table.addCell("USER MANAGEMENT", center);
+        // Add product details with the exact same formatting
+        table.addCell(String.format("UUID: %s", product.getUuid()));
+        table.addCell(String.format("Name: %s", product.getName()));
+        table.addCell(String.format("Price: $%.2f", product.getPrice()));
+        table.addCell(String.format("Quantity: %d", product.getQuantity()));
+        table.addCell(String.format("Category: %s", product.getCategoryName()));
+        table.addCell(String.format("Status: %s", product.getIsDeleted() ? "Deleted" : "Active"));
 
-        String[] menuItems = {
-                "                1. View All Users",
-                "                2. Create User",
-                "                3. Update User",
-                "                4. Find User by UUID",
-                "                5. Delete User",
-                "                5. Back to Main Menu"
-        };
+        // Get the rendered table
+        String tableString = table.render();
 
-        for (String item : menuItems) {
-            menuTable.addCell(item);
+        // Color only the outer borders (top, bottom, left, right)
+        String[] lines = tableString.split("\n");
+        StringBuilder result = new StringBuilder();
+
+        if (lines.length > 1) {
+            // Color top border
+            result.append(BLUE).append(lines[0]).append(RESET).append("\n");
+
+            // Color side borders for content lines
+            for (int i = 1; i < lines.length - 1; i++) {
+                result.append(BLUE).append("│").append(RESET)
+                        .append(lines[i].substring(1, lines[i].length() - 1))
+                        .append(BLUE).append("│").append(RESET)
+                        .append("\n");
+            }
+
+            // Color bottom border
+            result.append(BLUE).append(lines[lines.length - 1]).append(RESET);
         }
 
-        return table.render() +"\n" + menuTable.render();
+        return result.toString();
+    }
+    public static String printReceiptUI(OrderDTO order) {
+
+    Table  table = new Table(1, border, ShownBorders.SURROUND);
+    table.setColumnWidth(0, 50, 100); // optional, for nice width
+
+    table.addCell(YELLOW+"ORDER RECEIPT"+RESET, center);
+    table.addCell("---------------------------------------------------");
+    table.addCell("Order Code  : " + order.orderCode());
+    table.addCell("Order Date  : " + order.orderDate());
+    table.addCell("---------------------------------------------------");
+    // Column headers
+    table.addCell(String.format("%-20s %5s %15s", "Product", "Qty", "Price"),center);
+
+    // Items
+    for (OrderItemDto item : order.items()) {
+        table.addCell(String.format("%-20s %5d %15.2f",
+                item.productName(), item.quantity(), item.productPrice()), center);
+    }
+
+    table.addCell("---------------------------------------------------");
+    table.addCell(String.format("Total Quantity: %d", order.totalQuantity()));
+    table.addCell(String.format("Total Price   : $%.2f", order.totalPrice()));
+    table.addCell("===================================================");
+    return table.render();
+    }
+    public static String cartItemUI(List<Cart> cartItems) {
+
+        Table table = new Table(2, border, ShownBorders.SURROUND);
+        CellStyle center = new CellStyle(CellStyle.HorizontalAlign.CENTER);
+
+        // Set column widths to fit full UUID
+        table.setColumnWidth(0, 40, 80); // UUID can be long
+        table.setColumnWidth(1, 10, 20); // Quantity is short
+
+//        table.addCell(YELLOW+"CART ITEM"+RESET, center);
+        table.addCell("\u001B[1;33mProduct UUID\u001B[0m");
+        table.addCell("\u001B[1;33mQuantity\u001B[0m", center);
+
+        for (Cart cart : cartItems) {
+            table.addCell(cart.getProductId()); // UUID as String
+            table.addCell(String.valueOf(cart.getQuantity()), center);
+        }
+
+        return table.render();
+    }
+    public static String orderDetailUI(OrderDTO order) {
+
+        Table table = new Table(3, border, ShownBorders.SURROUND);
+        CellStyle center = new CellStyle(CellStyle.HorizontalAlign.CENTER);
+
+        // Set custom column widths for better UUID and price display
+        table.setColumnWidth(0, 20, 30); // Product Name
+        table.setColumnWidth(1, 10, 15); // Price
+        table.setColumnWidth(2, 10, 10); // Quantity
+
+        // Header
+        table.addCell("\u001B[1;33mProduct\u001B[0m");
+        table.addCell("\u001B[1;33mPrice\u001B[0m", center);
+        table.addCell("\u001B[1;33mQuantity\u001B[0m", center);
+
+        // Order Items
+        for (OrderItemDto item : order.items()) {
+            table.addCell(item.productName());
+            table.addCell(String.format("%.2f", item.productPrice()), center);
+            table.addCell(String.valueOf(item.quantity()), center);
+        }
+
+        String header = String.format(
+                "\u001B[1;36mOrder Code\u001B[0m: %s\n\u001B[1;36mDate\u001B[0m      : %s\n\u001B[1;36mTotal\u001B[0m     : $%.2f\n",
+                order.orderCode(), order.orderDate(), order.totalPrice()
+        );
+
+        return  table.render() + "\n" + header;
     }
 
 }

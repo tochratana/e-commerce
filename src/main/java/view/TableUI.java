@@ -1,5 +1,6 @@
 package view;
 
+import model.dto.order.OrderDTO;
 import model.dto.order.OrderItemDto;
 import model.dto.product.ProductResponseDto;
 import model.dto.user.UserResponseDto;
@@ -39,7 +40,12 @@ public class TableUI<T> {
         } else if (firstItem instanceof OrderItemDto) {
             table = new Table(4, borderStyle, ShownBorders.ALL);
             columnNames = new String[]{"ORDER ID", "Product Name", "Price", "Quantity"};
-        } else {
+        }else if (firstItem instanceof OrderDTO) {
+            table = new Table(5, borderStyle, ShownBorders.ALL);
+            columnNames = new String[]{"Order ID", "Order Code", "Date", "Total Items", "Total Price"};
+        }
+
+        else {
             System.out.println("Unsupported data type.");
             return;
         }
@@ -67,6 +73,13 @@ public class TableUI<T> {
                 table.addCell(dto.productName(), center);
                 table.addCell(String.valueOf(dto.productPrice()), center);
                 table.addCell(String.valueOf(dto.quantity()), center);
+            }
+            else if (t instanceof OrderDTO dto) {
+                table.addCell(String.valueOf(dto.id()), center);
+                table.addCell(dto.orderCode(), center);
+                table.addCell(dto.orderDate().toString(), center);
+                table.addCell(String.valueOf(dto.totalQuantity()), center);
+                table.addCell(String.format("%.2f", dto.totalPrice()), center);
             }
         }
 

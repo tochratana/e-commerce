@@ -7,6 +7,7 @@ import model.dto.CartItemCreateDto;
 import model.dto.order.OrderDTO;
 import model.dto.order.OrderItemDto;
 import model.dto.product.ProductResponseDto;
+import model.dto.user.UserResponseDto;
 import model.entities.Cart;
 import model.entities.Users;
 
@@ -15,6 +16,8 @@ import java.util.Scanner;
 
 import model.service.UserService;
 import model.service.UserServiceImpl;
+import static view.UserUI.*;
+import static view.TableUI.*;
 
 public class OrderUI {
     private final ProductController productController;
@@ -29,15 +32,17 @@ public class OrderUI {
 
     public void start(int userId) {
         while (true) {
-            System.out.println("\nOrder Menu");
-            System.out.println("1. Place Order");
-            System.out.println("2. View All Orders");
-            System.out.println("3. View Order Detail");
-            System.out.println("4. Cancel Order");
-            System.out.println("5.Add Item to Cart");
-            System.out.println("6.View Cart");
-            System.out.println("7. Back to Main Menu ");
-            System.out.print("Choose: ");
+            //todo add table
+            System.out.println(completeUITable.showOrderMenuUI());
+//            System.out.println("\nOrder Menu");
+//            System.out.println("1. Place Order");
+//            System.out.println("2. View All Orders");
+//            System.out.println("3. View Order Detail");
+//            System.out.println("4. Cancel Order");
+//            System.out.println("5.Add Item to Cart");
+//            System.out.println("6.View Cart");
+//            System.out.println("7. Back to Main Menu ");
+            System.out.print("[+] Choose an option: ");
 
             int choice = readInt("Please enter a valid number between 0 and 4: ");
             switch (choice) {
@@ -81,9 +86,11 @@ public class OrderUI {
 
                         if (!cartItems.isEmpty()) {
                             System.out.println("===== Cart Items =====");
-                            cartItems.forEach(cart -> System.out.println(
-                                    "Product UUID: " + cart.getProductId() +
-                                            ", Quantity: " + cart.getQuantity()));
+//                            cartItems.forEach(cart -> System.out.println(
+//                                    "Product UUID: " + cart.getProductId() +
+//                                            ", Quantity: " + cart.getQuantity()));
+//                            todo add table
+                            System.out.println(completeUITable.cartItemUI(cartItems));
                         } else {
                             System.out.println("🛒 Your cart is empty.");
                         }
@@ -114,32 +121,37 @@ public class OrderUI {
     }
 
     private void printReceipt(OrderDTO order) {
-        System.out.println("\n========= 🧾 ORDER RECEIPT =========");
-        System.out.println("Order Code  : " + order.orderCode());
-        System.out.println("Order Date  : " + order.orderDate());
-        System.out.println("-------------------------------------");
-        System.out.printf("%-20s %5s %10s%n", "Product", "Qty", "Price");
-        for (OrderItemDto item : order.items()) {
-            System.out.printf("%-20s %5d %10.2f%n",
-                    item.productName(), item.quantity(), item.productPrice());
-        }
-        System.out.println("-------------------------------------");
-        System.out.printf("Total Quantity: %d%n", order.totalQuantity());
-        System.out.printf("Total Price   : $%.2f%n", order.totalPrice());
-        System.out.println("=====================================\n");
+        //todo add table
+        System.out.println(completeUITable.printReceiptUI(order));
+//        System.out.println("\n========= 🧾 ORDER RECEIPT =========");
+//        System.out.println("Order Code  : " + order.orderCode());
+//        System.out.println("Order Date  : " + order.orderDate());
+//        System.out.println("-------------------------------------");
+//        System.out.printf("%-20s %5s %10s%n", "Product", "Qty", "Price");
+//        for (OrderItemDto item : order.items()) {
+//            System.out.printf("%-20s %5d %10.2f%n", item.productName(), item.quantity(), item.productPrice());
+//        }
+//        System.out.println("-------------------------------------");
+//        System.out.printf("Total Quantity: %d%n", order.totalQuantity());
+//        System.out.printf("Total Price   : $%.2f%n", order.totalPrice());
+//        System.out.println("=====================================\n");
     }
 
 
     private void viewAllOrders(int userId) {
         List<OrderDTO> orders = controller.getOrdersByUser(userId);
+    //todo table style
+        TableUI<OrderDTO> tableUI = new TableUI<>();
+        tableUI.getTableDisplay(orders);
+
         if (orders.isEmpty()) {
             System.out.println("No orders found.");
             return;
         }
-        orders.forEach(o -> System.out.printf(
-                "Order ID: %d, Order Code: %s, Date: %s, Total Items: %d, Total Price: %.2f%n",
-                o.id(), o.orderCode(), o.orderDate(), o.totalQuantity(), o.totalPrice()
-        ));
+//        orders.forEach(o -> System.out.printf(
+//                "Order ID: %d, Order Code: %s, Date: %s, Total Items: %d, Total Price: %.2f%n",
+//                o.id(), o.orderCode(), o.orderDate(), o.totalQuantity(), o.totalPrice()
+//        ));
     }
 
     private void viewOrderDetail() {
@@ -149,13 +161,15 @@ public class OrderUI {
             System.out.println("Order not found.");
             return;
         }
-        System.out.printf("Order Code: %s, Date: %s, Total Price: %.2f%n",
-                order.orderCode(), order.orderDate(), order.totalPrice());
-
-        for (OrderItemDto item : order.items()) {
-            System.out.printf(" - %s: %.2f x %d%n",
-                    item.productName(), item.productPrice(), item.quantity());
-        }
+//        System.out.printf("Order Code: %s, Date: %s, Total Price: %.2f%n",
+//                order.orderCode(), order.orderDate(), order.totalPrice());
+//
+//        for (OrderItemDto item : order.items()) {
+//            System.out.printf(" - %s: %.2f x %d%n",
+//                    item.productName(), item.productPrice(), item.quantity());
+//        }
+        //todo add table
+        System.out.println(completeUITable.orderDetailUI(order));
     }
 
     private void cancelOrder(int userId) {

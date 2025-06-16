@@ -40,41 +40,44 @@ public class UserUI {
 
     private static void loginMenu() {
         ModernUIComponents.showWelcomeSplash("E-Commerce","1.0.0");
-        System.out.println("============================");
-        System.out.println("      User Creation    ");
-        System.out.println("============================");
-        System.out.println("""
-                1. Register
-                2. Login
-                3. Exit
-                """);
+        System.out.println(completeUITable.LoginMenuUI());
+//        System.out.println("============================");
+//        System.out.println("      User Creation    ");
+//        System.out.println("============================");
+//        System.out.println("""
+//                1. Register
+//                2. Login
+//                3. Exit
+//                """);
     }
 
     private static void mainMenu() {
-        System.out.println("============================");
-        System.out.println("       Main Menu        ");
-        System.out.println("============================");
-        System.out.println("""
-                1. User Management
-                2. Product Management
-                3. Order Management
-                4. Logout
-                5. Exit
-                """);
+        System.out.println(completeUITable.showMainMenuUI());
+//        System.out.println("============================");
+//        System.out.println("       Main Menu        ");
+//        System.out.println("============================");
+//        System.out.println("""
+//                1. User Management
+//                2. Product Management
+//                3. Order Management
+//                4. Logout
+//                5. Exit
+//                """);
     }
 
     private static void userManagementMenu() {
-        System.out.println("============================");
-        System.out.println("     User Management    ");
-        System.out.println("============================");
-        System.out.println("""
-                1. View All Users
-                2. Create User
-                3. Update User
-                4. Find User by UUID
-                5. Delete User
-                6. Back to Main Menu
-                """);
+        System.out.println(completeUITable.showUserMenuUI());
+//        System.out.println("============================");
+//        System.out.println("     User Management    ");
+//        System.out.println("============================");
+//        System.out.println("""
+//                1. View All Users
+//                2. Create User
+//                3. Update User
+//                4. Find User by UUID
+//                5. Delete User
+//                6. Back to Main Menu
+//                """);
     }
 
     public static void home() {
