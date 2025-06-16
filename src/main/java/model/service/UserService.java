@@ -1,9 +1,9 @@
 package model.service;
 
-import model.dto.DeleteUserDto;
-import model.dto.UpdateUserDto;
-import model.dto.UserCreateDto;
-import model.dto.UserResponseDto;
+import model.dto.user.DeleteUserDto;
+import model.dto.user.UpdateUserDto;
+import model.dto.user.UserCreateDto;
+import model.dto.user.UserResponseDto;
 import model.entities.Users;
 
 import java.util.List;
@@ -15,8 +15,8 @@ public interface UserService {
     Integer deleteUserByUuid(String uuid, DeleteUserDto deleteUserDto);
     UserResponseDto getUserByUuid(String uuid);
     UserResponseDto updateUserByUuid(String uuid, UpdateUserDto updateUserDto);
-    void writeSessionToFile(Users user,String action);
-    boolean logout(String uuid);
+    void writeSessionToFile(Users user);  // Remove String action parameter
+    boolean logout();                     // Remove String uuid parameter
     Users loadCurrentSession();
     void clearCurrentSession();
 }

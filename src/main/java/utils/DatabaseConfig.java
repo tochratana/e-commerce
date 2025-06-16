@@ -1,20 +1,33 @@
 package utils;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.util.Properties;
 
 public class DatabaseConfig {
-    private static final String databaseUrl = "jdbc:postgresql://dpg-d12n5715pdvs73ctrn00-a.oregon-postgres.render.com:5432/e_commerce_heqn";
-    private static final String userName = "istad_e_commerce";
-    private static final String password = "NK4DihgbjX8WW8LkA5E1I1Z8Mt9Pf7HG";
+
+    private static final String PROPERTIES_FILE = "app.properties";
 
     public static Connection getDatabaseConnection() {
-        try {
-            return DriverManager.getConnection(databaseUrl, userName, password);
-        } catch (Exception exception) {
-            System.err.println("[!] ERROR during get database connection: " + exception.getMessage());
-            exception.printStackTrace();
+        Properties props = new Properties();
+
+        try (FileInputStream fis = new FileInputStream(PROPERTIES_FILE)) {
+            props.load(fis);
+
+            String url = props.getProperty("db_url");
+            String username = props.getProperty("db_username");
+            String password = props.getProperty("db_password");
+
+            return DriverManager.getConnection(url, username, password);
+        } catch (IOException e) {
+            System.err.println("[!] Failed to load app.properties: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("[!] Failed to connect to DB: " + e.getMessage());
+            e.printStackTrace();
         }
+
         return null;
     }
 }

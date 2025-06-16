@@ -1,5 +1,8 @@
 package view;
+
+import model.dto.order.OrderItemDto;
 import model.dto.product.ProductResponseDto;
+import model.dto.user.UserResponseDto;
 import org.nocrala.tools.texttablefmt.BorderStyle;
 import org.nocrala.tools.texttablefmt.CellStyle;
 import org.nocrala.tools.texttablefmt.ShownBorders;
@@ -9,44 +12,64 @@ import java.util.List;
 
 public class TableUI<T> {
     private Table table;
-    private String [] columnNames;
+    private String[] columnNames;
     private final CellStyle center = new CellStyle(CellStyle.HorizontalAlign.CENTER);
-    public void getTableDisplay(List<T> tList){
-        if(tList.getFirst() instanceof ProductResponseDto){
-            table = new Table(6, BorderStyle.UNICODE_BOX_DOUBLE_BORDER,
-                    ShownBorders.ALL);
-            columnNames= new String[] {"UUID","Name","Price","Quantity","Category","Status"};
 
+    // ANSI color codes for styling headers (bold yellow)
+    private static final String HEADER_COLOR = "\u001B[1;33m"; // Bold yellow
+    private static final String RESET_COLOR = "\u001B[0m";
+
+    public void getTableDisplay(List<T> tList) {
+        if (tList == null || tList.isEmpty()) {
+            System.out.println("No data to display.");
+            return;
         }
-        // TODO for users
-//        if(tList.getFirst() instanceof UserResponseDto){
-//            table = new Table(4, BorderStyle.UNICODE_BOX_DOUBLE_BORDER,
-//                    ShownBorders.ALL);
-//            columnNames= new String[] {"UUID","User Name","Email","Created Date"};
-//        }
-        for(String column: columnNames){
-            table.addCell(column,center);
+
+        T firstItem = tList.get(0);
+
+        // ✅ Use simple ASCII border for full compatibility
+        BorderStyle borderStyle = BorderStyle.CLASSIC_WIDE;
+
+        if (firstItem instanceof ProductResponseDto) {
+            table = new Table(6, borderStyle, ShownBorders.ALL);
+            columnNames = new String[]{"UUID", "Name", "Price", "Quantity", "Category", "Status"};
+        } else if (firstItem instanceof UserResponseDto) {
+            table = new Table(3, borderStyle, ShownBorders.ALL);
+            columnNames = new String[]{"UUID", "User Name", "Email"};
+        } else if (firstItem instanceof OrderItemDto) {
+            table = new Table(4, borderStyle, ShownBorders.ALL);
+            columnNames = new String[]{"ORDER ID", "Product Name", "Price", "Quantity"};
+        } else {
+            System.out.println("Unsupported data type.");
+            return;
         }
-        for(T t: tList){
-            if(t instanceof ProductResponseDto){
-                table.addCell(((ProductResponseDto) t).getUuid(),center);
-                table.addCell(((ProductResponseDto )t).getName(),center);
-                table.addCell(String.valueOf(((ProductResponseDto)t).getPrice()),center);
-                table.addCell(String.valueOf(((ProductResponseDto)t).getQuantity()),center);
-                table.addCell(((ProductResponseDto )t).getCategoryName(),center);
-                table.addCell(((ProductResponseDto )t).getIsDeleted().toString(),center);
+
+        // ✅ Add headers with color
+        for (String column : columnNames) {
+            table.addCell(HEADER_COLOR + column + RESET_COLOR, center);
+        }
+
+        // ✅ Add data rows
+        for (T t : tList) {
+            if (t instanceof ProductResponseDto dto) {
+                table.addCell(dto.getUuid(), center);
+                table.addCell(dto.getName(), center);
+                table.addCell(String.valueOf(dto.getPrice()), center);
+                table.addCell(String.valueOf(dto.getQuantity()), center);
+                table.addCell(dto.getCategoryName(), center);
+                table.addCell(String.valueOf(dto.getIsDeleted()), center);
+            } else if (t instanceof UserResponseDto dto) {
+                table.addCell(dto.uuid().toString(), center);
+                table.addCell(dto.username(), center);
+                table.addCell(dto.email(), center);
+            } else if (t instanceof OrderItemDto dto) {
+                table.addCell(String.valueOf(dto.orderId()), center);
+                table.addCell(dto.productName(), center);
+                table.addCell(String.valueOf(dto.productPrice()), center);
+                table.addCell(String.valueOf(dto.quantity()), center);
             }
-            // TODO for users
-//            if(t instanceof UserResponseDto){
-//                table.addCell(((UserResponseDto)t).uuid(), center);
-//                table.addCell(((UserResponseDto)t).userName(), center);
-//                table.addCell(((UserResponseDto)t).email(), center);
-//                table.addCell(((UserResponseDto)t).createdDate().toString(), center);
-//            }
         }
-//        for(int i =0;i< columnNames.length;i++){
-//            table.setColumnWidth(i, 40,45);
-//        }
+
         System.out.println(table.render());
     }
 }

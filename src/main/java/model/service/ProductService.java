@@ -3,6 +3,7 @@ package model.service;
 import model.dto.product.ProductCreateDto;
 import model.dto.product.ProductResponseDto;
 import model.dto.product.UpdateProductDto;
+import model.entities.Product;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,4 +32,5 @@ public interface ProductService {
     void insertMillionProducts();
 
     void readMillionProducts();
+    Product getProductById(int productId);
 }
