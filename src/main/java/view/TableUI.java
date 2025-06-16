@@ -69,10 +69,7 @@ public class TableUI<T> {
                 table.addCell(String.valueOf(dto.quantity()), center);
             }
         }
-        //git add .
-        //git commit -m "Test commit with correct identity"
-        //git push origin main
-        // ✅ Print the table
+
         System.out.println(table.render());
     }
 }
